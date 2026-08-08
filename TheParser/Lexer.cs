@@ -90,7 +90,7 @@ public class Lexer
 
         if (char.IsDigit(currentChar))
         {
-            int value = ParseNumber(currentChar);
+            double value = ParseNumber(currentChar);
             return CreateToken(TokenType.Number, value);
         }
 
@@ -184,7 +184,7 @@ public class Lexer
 
     public bool IsEndOfContent => CurrentPosition >= _content.Length; 
 
-    private int ParseNumber(char? currentChar)
+    private double ParseNumber(char? currentChar)
     {
         if (currentChar == null)
             return 0;
