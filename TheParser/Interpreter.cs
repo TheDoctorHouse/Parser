@@ -2,25 +2,42 @@ using System.Diagnostics;
 
 namespace TheParser;
 
+public interface IStringInterpretable
+{
+    StringInterpretation InterpretToString();
+}
 
 public abstract record class Interpretation;
 
-public record class NothingInterpretation : Interpretation;
+public record class NothingInterpretation : Interpretation, IStringInterpretable
+{
+    public StringInterpretation InterpretToString()
+    {
+        return new StringInterpretation("Nothing.");
+    }
+}
 
-public record class StringInterpretation(string Value) : Interpretation;
+public record class StringInterpretation(string Value) : Interpretation, IStringInterpretable
+{
+    public StringInterpretation InterpretToString()
+    {
+        return new StringInterpretation(Value);
+    }
+}
 
-public record class NumberInterpretation(double Value) : Interpretation;
+public record class NumberInterpretation(double Value) : Interpretation, IStringInterpretable
+{
+    public StringInterpretation InterpretToString()
+    {
+        return new StringInterpretation(Value.ToString());
+    }
+}
 
-public record class NullInterpretation() : Interpretation;
+public record class NullInterpretation : Interpretation;
 
 public class Interpreter
 {
     private Dictionary<string, Interpretation> _variables = new();
-
-    public static void Print(string content)
-    {
-        Console.WriteLine(content);
-    }
 
     public void InterpretStatement(Statement statement)
     {
@@ -53,7 +70,7 @@ public class Interpreter
 
                 string identString = functionIdent.Identifier;
 
-                switch (identString)
+                switch (identString) // hardcoded for now
                 {
                     case "Print":
                         if (ce.Arguments.Count != 1)
@@ -61,7 +78,11 @@ public class Interpreter
                         
                         Interpretation interpretation = InterpretExpression(ce.Arguments[0]);
 
-                        string output = Print(interpretation);
+                        string output;
+                        if (interpretation is not IStringInterpretable si)
+                            output = $"[Interpretation of type {interpretation.GetType().Name}]";
+                        else
+                            output = si.InterpretToString().Value;
 
                         Console.Write(output);
 
@@ -113,11 +134,11 @@ public class Interpreter
             case NumberInterpretation leftNumber when right is NumberInterpretation rightNumber:
                 double value = Calculate(leftNumber.Value, @operator, rightNumber.Value);
                 return new NumberInterpretation(value);
-            case StringInterpretation leftStr 
-                when right is StringInterpretation rightStr 
-                && @operator is TokenType.Plus:
-
-                return new StringInterpretation(leftStr.Value + rightStr.Value);
+            case IStringInterpretable leftStr
+            when right is IStringInterpretable rightStr
+            && @operator is TokenType.Plus:
+                string res = leftStr.InterpretToString().Value + rightStr.InterpretToString().Value;
+                return new StringInterpretation(res);
             default:
                 throw new OperationInterpretationException(left, @operator, right);
         }
@@ -149,17 +170,6 @@ public class Interpreter
             default:
                 throw new OperationInterpretationException(interpretation, @operator);
         }
-    }
-
-    private string Print(Interpretation interpretation)
-    {
-        return interpretation switch
-        {
-            NothingInterpretation ne => "Emptiness",
-            StringInterpretation se => se.Value,
-            NumberInterpretation ne => ne.Value.ToString(),
-            _ => throw new NotImplementedException($"Interpretation of type {interpretation.GetType().FullName} is not implemented.")
-        };
     }
 
     private void InterpretExpressionStatement(ExpressionStatement es)
