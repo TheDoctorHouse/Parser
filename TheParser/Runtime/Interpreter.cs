@@ -72,7 +72,9 @@ public class Interpreter
 
                 string identString = functionIdent.Identifier;
 
-                switch (identString) // hardcoded for now
+                // Built-ins are dispatched here until the language supports
+                // user-defined functions and a callable environment.
+                switch (identString)
                 {
                     case "Print":
                         if (ce.Arguments.Count != 1)

@@ -121,6 +121,7 @@ public class Lexer
         
         while (currentChar != null && currentChar.Value != '"')
         {
+            // `\n` is currently the only escape sequence in the language. The more escape sequences will be added later.
             if (currentChar.Value == '\\' 
             && CurrentPosition + 1 != _content.Length 
             && _content[CurrentPosition + 1] == 'n')
