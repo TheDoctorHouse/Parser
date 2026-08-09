@@ -1,7 +1,7 @@
-
+using TheParser.Lexing;
 using System.Diagnostics;
 
-namespace TheParser;
+namespace TheParser.Syntax;
 
 public abstract record class Expr;
 

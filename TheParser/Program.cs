@@ -1,8 +1,12 @@
-﻿using TheParser;
+﻿using TheParser.Lexing;
+using TheParser.Parsing;
+using TheParser.Debugging;
+using TheParser.Runtime;
 
 if (args.Length <= 1)
 {
     Console.WriteLine("Usage: interpret <file>");
+
     return 1;
 }
 

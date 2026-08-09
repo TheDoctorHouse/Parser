@@ -1,7 +1,10 @@
 
+using TheParser.Lexing;
+using TheParser.Syntax;
+
 using System.Diagnostics;
 
-namespace TheParser;
+namespace TheParser.Parsing;
 
 public class AstBuilder
 {
