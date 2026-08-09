@@ -10,41 +10,41 @@ public static class DebugUtility
     {
         var sb = new StringBuilder();
 
-        int start = position - SHOW_LETTERS;
-        int end = position + SHOW_LETTERS;
+        int lineStart = content.LastIndexOf('\n', Math.Max(0, position - 1));
+        lineStart = lineStart == -1 ? 0 : lineStart + 1;
 
-        bool sliceEnd = end < content.Length;
-        bool sliceStart = start < 0;
+        int lineEnd = content.IndexOf('\n', position);
+        lineEnd = lineEnd == -1 ? content.Length : lineEnd;
 
-        int arrowCol;
+        if (lineEnd > lineStart && content[lineEnd - 1] == '\r')
+            lineEnd--;
+
+        int start = Math.Max(lineStart, position - SHOW_LETTERS);
+        int end = Math.Min(lineEnd, position + SHOW_LETTERS + 1);
+
+        bool sliceStart = start > lineStart;
+        bool sliceEnd = end < lineEnd;
+
+        int arrowCol = position - start;
 
         if (sliceStart)
         {
-            arrowCol = position;
-            start = 0;
-        }
-        else
-        {
             sb.Append("...");
-            arrowCol = 3 + (position - start);
+            arrowCol += 3;
         }
 
+        sb.Append(content[start..end]);
 
-        if (!sliceEnd)
-            end = content.Length - 1;
-
-        sb.Append(content[start..(end+1)]);
-        
         if (sliceEnd)
             sb.Append("...");
 
         AppendWhitespaces(sb, arrowCol);
-        sb.Append('↑');
+        sb.Append('^');
         AppendWhitespaces(sb, arrowCol);
         sb.Append('|');
         AppendWhitespaces(sb, arrowCol);
         sb.Append('|');
-        AppendWhitespaces(sb, arrowCol - 2);
+        AppendWhitespaces(sb, Math.Max(0, arrowCol - 2));
         sb.Append("HERE");
 
         return sb.ToString();
