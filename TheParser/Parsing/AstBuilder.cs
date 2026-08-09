@@ -67,6 +67,8 @@ public class AstBuilder
 
     public Expr ParseExpression()
     {
+        // Keep additive operators at this level so ParseTerm gives * and /
+        // higher precedence than + and -.
         Expr expr = ParseTerm();       
 
         while (Match(TokenType.Plus, TokenType.Minus))
@@ -115,6 +117,7 @@ public class AstBuilder
     {
         Expr expr = ParsePrimary();
 
+        // A loop permits chained calls such as makeAdder(1)(2).
         while (Match(TokenType.OpeningParentheses))
         {
             expr = FinishCall(expr);
