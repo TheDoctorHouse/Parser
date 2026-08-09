@@ -1,4 +1,7 @@
-namespace TheParser;
+using TheParser.Syntax;
+using TheParser.Lexing;
+
+namespace TheParser.Parsing;
 
 public class Parser
 {

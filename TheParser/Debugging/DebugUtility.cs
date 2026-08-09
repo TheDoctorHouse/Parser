@@ -1,3 +1,5 @@
+namespace TheParser.Debugging;
+
 using System.Text;
 
 public static class DebugUtility

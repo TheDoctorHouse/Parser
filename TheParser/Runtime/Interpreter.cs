@@ -1,6 +1,8 @@
 using System.Diagnostics;
+using TheParser.Syntax;
+using TheParser.Lexing;
 
-namespace TheParser;
+namespace TheParser.Runtime;
 
 public interface IStringInterpretable
 {

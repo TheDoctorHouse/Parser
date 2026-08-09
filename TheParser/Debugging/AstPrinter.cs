@@ -1,6 +1,7 @@
-namespace TheParser;
-
 using System.Text;
+using TheParser.Syntax;
+
+namespace TheParser.Debugging;
 
 public class AstPrinter
 {

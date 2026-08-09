@@ -1,7 +1,7 @@
+using TheParser.Lexing;
 using System.Text;
-using TheParser;
 
-namespace TheParser;
+namespace TheParser.Parsing;
 
 public class UnexpectedTokenException : Exception
 {

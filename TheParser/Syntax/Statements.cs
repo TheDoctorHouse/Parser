@@ -1,4 +1,6 @@
-namespace TheParser;
+using TheParser.Lexing;
+
+namespace TheParser.Syntax;
 
 public abstract record Statement;
 

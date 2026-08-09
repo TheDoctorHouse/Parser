@@ -1,6 +1,7 @@
+using TheParser.Debugging;
 using System.Text;
 
-namespace TheParser;
+namespace TheParser.Lexing;
 
 public class Lexer
 {

@@ -1,4 +1,4 @@
-namespace TheParser;
+namespace TheParser.Lexing;
 
 public static class TokenUtility 
 {
