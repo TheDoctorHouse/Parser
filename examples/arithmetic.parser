@@ -1,0 +1,2 @@
+@result = -(4 + 2) * 3 + 20 / 5;
+Print("Result: " + result + "\n");
