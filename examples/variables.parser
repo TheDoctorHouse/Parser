@@ -1,0 +1,3 @@
+@greeting = "Parser";
+@version = 1;
+Print("Hello from " + greeting + " version " + version + "!\n");
