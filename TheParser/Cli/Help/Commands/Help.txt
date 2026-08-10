@@ -1,0 +1,4 @@
+Usage:
+  {0}
+
+Display help information about commands.

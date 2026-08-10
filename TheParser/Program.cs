@@ -1,64 +1,50 @@
-﻿using TheParser.Lexing;
-using TheParser.Parsing;
-using TheParser.Debugging;
-using TheParser.Runtime;
+﻿using TheParser.Cli;
+using TheParser.Cli.Commands;
 
-if (args.Length <= 1)
+if (args.Length == 0)
 {
-    Console.WriteLine("Usage: interpret <file>");
-
-    return 1;
+    var text = CliHelper.Read(Resource.HelpGeneral);
+    Console.WriteLine(text);
+    return 3;
 }
 
-string path = args[1];
 
-if (!File.Exists(path))
+var commandName = args[0];
+
+
+CommandType? commandType = CommandHelper.GetCommandType(commandName);
+
+if (commandType == null)
 {
-    Console.Error.WriteLine($"File not found: {path}");
-    return 1;
+    var text = CliHelper.Read(Resource.UnknownCommand, commandName);
+    Console.Error.WriteLine(text);
+    return 3;
 }
 
-bool debug = args.Contains("--debug");
+// Assuming every command has zero arguments.
+// todo: unit test validating that command has 0 arguments.
+var command = (CliCommand)Activator.CreateInstance(commandType.Type)!;
 
-string code = File.ReadAllText(path);
-
-var tokenizer = new Lexer(code);
-
-if (debug)
+try
 {
-    var token = tokenizer.NextToken();
-    Console.WriteLine("Lexer:");
-    while (token.TokenType != TokenType.EOF)
-    {
-        if (token.Value != null)
-            Console.Write($"{token.TokenType}({token.Value}) ");
-        else
-            Console.Write($"{token.TokenType} ");
-        token = tokenizer.NextToken();
-    }
+    var argumentsProvider = new ArgumentsProvider(args);
 
-    Console.Write(token.TokenType);
+    CliCommandResult? result = argumentsProvider.Validate(commandType);
+
+    if (result != null)
+        return result.Value.AcknowledgeUser();
+
+    return command.Run(argumentsProvider).AcknowledgeUser();
 }
-
-tokenizer.Reset();
-
-
-var parser = new Parser(tokenizer);
-
-var statement = parser.Parse();
-
-if (debug)
+catch (Exception ex)
 {
-    Console.WriteLine("\nAst builder: ");
+    var failResult = CliCommandResult.Fail(ex);
+    int result = failResult.AcknowledgeUser();
+    bool showStackTrace = args.Contains("--stacktrace");
+    if (!showStackTrace)
+        Console.WriteLine("Use --stacktrace argument to show stacktrace.");
+    else
+        Console.WriteLine($"Stack trace:\n{ex.StackTrace}");
 
-    var printer = new AstPrinter();
-
-    string tree = printer.Print(statement);
-    Console.WriteLine(tree);
-    Console.WriteLine("Interpreter: ");
+    return result;
 }
-
-var interpreter = new Interpreter();
-
-interpreter.InterpretStatement(statement);
-return 0;

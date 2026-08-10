@@ -1,0 +1,10 @@
+A parser and interpreter written in C#.
+
+Usage:
+parser <command> [--stacktrace]
+
+Commands:
+help    Display help information about a command.
+interpret    Run the lexer, parser, and interpreter on a file.
+
+Run 'parser help <command>' for more information about a command.

@@ -1,0 +1,15 @@
+Run the lexer, parser, and interpreter on the specified file.
+
+Usage:
+  {0}
+
+The program is executed in the current console.
+
+Arguments:
+  <path>      Path to the source file
+
+Options:
+  --debug     Enable debug output
+
+Example:
+  parser interpret ./code
