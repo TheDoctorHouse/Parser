@@ -92,7 +92,7 @@ public class AstBuilder
         while (Match(TokenType.Multiply, TokenType.Divide))
         {
             Token op = Current;
-            Expr right = ParsePrimary();
+            Expr right = ParseUnary();
 
             expr = new BinaryExpression(expr, op.TokenType, right);
         }
