@@ -8,4 +8,8 @@
     <AssemblyName>parser</AssemblyName>
   </PropertyGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include ="Cli\Help\**\*.txt" />
+  </ItemGroup>
+
 </Project>
