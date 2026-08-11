@@ -53,11 +53,11 @@ public class Interpreter
                 InterpretExpression(es.Callee);
                 break;
             case VariableDeclarationStatement vds:
-                var interp = vds.initializer != null ?
-                 InterpretExpression(vds.initializer) : 
+                var interp = vds.Initializer != null ?
+                 InterpretExpression(vds.Initializer) : 
                  new NullInterpretation();
 
-                _variables.Add((string)vds.identifier.Value!, interp);
+                _variables.Add((string)vds.Identifier.Value!, interp);
                 break;
         }
     }
