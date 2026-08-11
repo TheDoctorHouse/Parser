@@ -34,11 +34,11 @@ public class AstPrinter
                 HandleExpression(es.Callee, 2);
                 break;
             case VariableDeclarationStatement vds:
-                AppendMessage($"Identifier ({vds.identifier.Value!})");
-                if (vds.initializer != null)
+                AppendMessage($"Identifier ({vds.Identifier.Value!})");
+                if (vds.Initializer != null)
                 {
                     AppendMessage("Initializer");
-                    HandleExpression(vds.initializer, 2);
+                    HandleExpression(vds.Initializer, 2);
                 }
                 else
                     AppendMessage("No initializer");
