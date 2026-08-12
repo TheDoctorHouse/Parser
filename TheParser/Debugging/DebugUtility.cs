@@ -1,31 +1,34 @@
 namespace TheParser.Debugging;
 
 using System.Text;
+using TheParser.Contracts;
 
 public static class DebugUtility
 {
     private const int SHOW_LETTERS = 15;
 
-    public static string PingPosition(int position, string content) 
+    public static string PingPosition(int position, ICodeStream codeStream) 
     {
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(position, codeStream.Length);
+        ArgumentOutOfRangeException.ThrowIfZero(codeStream.Length);
+
+        if (position == codeStream.Length)
+            position--;
+
         var sb = new StringBuilder();
 
-        int lineStart = content.LastIndexOf('\n', Math.Max(0, position - 1));
-        lineStart = lineStart == -1 ? 0 : lineStart + 1;
+        string line = codeStream.GetLine(position);
 
-        int lineEnd = content.IndexOf('\n', position);
-        lineEnd = lineEnd == -1 ? content.Length : lineEnd;
+        int lineStart = codeStream.GetLineStart(position);
+        int relativePosition = position - lineStart;
 
-        if (lineEnd > lineStart && content[lineEnd - 1] == '\r')
-            lineEnd--;
+        int start = Math.Max(0, relativePosition - SHOW_LETTERS);
+        int end = Math.Min(line.Length, relativePosition + SHOW_LETTERS + 1);
 
-        int start = Math.Max(lineStart, position - SHOW_LETTERS);
-        int end = Math.Min(lineEnd, position + SHOW_LETTERS + 1);
+        int arrowCol = relativePosition - start;
 
-        bool sliceStart = start > lineStart;
-        bool sliceEnd = end < lineEnd;
-
-        int arrowCol = position - start;
+        bool sliceStart = start > 0;
+        bool sliceEnd = end < line.Length - 1;
 
         if (sliceStart)
         {
@@ -33,7 +36,7 @@ public static class DebugUtility
             arrowCol += 3;
         }
 
-        sb.Append(content[start..end]);
+        sb.Append(line[start..end]);
 
         if (sliceEnd)
             sb.Append("...");

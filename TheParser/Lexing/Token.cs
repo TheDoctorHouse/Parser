@@ -1,11 +1,12 @@
 using System.Text;
+using TheParser.Contracts;
 using TheParser.Debugging;
 
 namespace TheParser.Lexing;
 
 public record Token(TokenType TokenType, object? Value, int Position)
 {
-    public void AppendDebugInfo(Lexer lexer, StringBuilder sb)
+    public void AppendDebugInfo(ICodeStream codeStream, StringBuilder sb)
     {
         sb.AppendLine($"TokenType: {TokenType}");
         if (Value == null)
@@ -13,13 +14,13 @@ public record Token(TokenType TokenType, object? Value, int Position)
         else
             sb.AppendLine($"Value: {Value}");
 
-        sb.AppendLine(DebugUtility.PingPosition(Position, lexer.Content));
+        sb.AppendLine(DebugUtility.PingPosition(Position, codeStream));
     }
 
-    public string GetDebugInfo(Lexer lexer)
+    public string GetDebugInfo(ICodeStream codeStream)
     {
-        StringBuilder sb = new StringBuilder();
-        AppendDebugInfo(lexer, sb);
+        StringBuilder sb = new ();
+        AppendDebugInfo(codeStream, sb);
         return sb.ToString();
     }
 }

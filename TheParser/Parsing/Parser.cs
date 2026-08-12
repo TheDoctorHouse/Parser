@@ -1,20 +1,14 @@
 using TheParser.Syntax;
 using TheParser.Lexing;
+using TheParser.Contracts;
 
 namespace TheParser.Parsing;
 
-public class Parser
+public class Parser(Lexer lexer, ICodeStream codeStream)
 {
-    private readonly Lexer _tokenizer;
-
-    public Parser(Lexer tokenizer)
-    {
-        _tokenizer = tokenizer;
-    }
-
     public Statement Parse()
     {
-        AstBuilder builder = new AstBuilder(_tokenizer);
+        AstBuilder builder = new AstBuilder(lexer, codeStream);
 
         return builder.ParseBlockStatement();
     }

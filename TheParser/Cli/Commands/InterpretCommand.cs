@@ -4,6 +4,7 @@ using TheParser.Runtime;
 using TheParser.Syntax;
 using TheParser.Debugging;
 using TheParser.Cli.Attributes;
+using TheParser.Contracts;
 
 namespace TheParser.Cli.Commands;
 
@@ -28,7 +29,8 @@ public sealed class InterpretCommand : CliCommand
 
         string content = File.ReadAllText(filePath);
 
-        Lexer lexer = new (content);
+        ICodeStream cliCodeStream = new CliCodeStream(content);
+        Lexer lexer = new (cliCodeStream);
 
         if (debug)
         {
@@ -48,7 +50,7 @@ public sealed class InterpretCommand : CliCommand
 
         lexer.Reset();
     
-        Parser parser = new (lexer);
+        Parser parser = new (lexer, cliCodeStream);
 
         Statement statement;
 
