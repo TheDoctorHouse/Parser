@@ -49,8 +49,6 @@ public class CliCodeStream(string content) : ICodeStream
         int start = GetLineStart(position);
         int end = GetLineEnd(position);
 
-        Debug.Assert(start >= 0);
-        Debug.Assert(end <= content.Length);
         return content[start..end];
     }
 
@@ -79,6 +77,11 @@ public class CliCodeStream(string content) : ICodeStream
 
     public int GetLineStart(int position)
     {
+        if (content[position] == '\n')
+            position--;
+
+        if (position == 0)
+            return position;
         var start = content.LastIndexOf('\n', position);
         return start == -1 ? 0 : start + 1;
     }

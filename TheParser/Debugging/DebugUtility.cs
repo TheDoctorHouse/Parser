@@ -9,18 +9,23 @@ public static class DebugUtility
 
     public static string PingPosition(int position, ICodeStream codeStream) 
     {
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(position, codeStream.Length);
+        ArgumentOutOfRangeException.ThrowIfZero(codeStream.Length);
+
+        if (position == codeStream.Length)
+            position--;
+
         var sb = new StringBuilder();
 
         string line = codeStream.GetLine(position);
+
         int lineStart = codeStream.GetLineStart(position);
         int relativePosition = position - lineStart;
 
         int start = Math.Max(0, relativePosition - SHOW_LETTERS);
         int end = Math.Min(line.Length, relativePosition + SHOW_LETTERS + 1);
-        Console.WriteLine(line);
-        Console.WriteLine($"Start {start} end {end}");
 
-        int arrowCol = position - lineStart;
+        int arrowCol = relativePosition - start;
 
         bool sliceStart = start > 0;
         bool sliceEnd = end < line.Length - 1;
