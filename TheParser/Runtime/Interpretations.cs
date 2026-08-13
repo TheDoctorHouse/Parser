@@ -1,11 +1,16 @@
 namespace TheParser.Runtime;
 
-public interface IStringInterpretable
+public interface IStringInterpretable : IInterpretationConstraint
 {
     StringInterpretation InterpretToString();
 }
 
-public abstract record class Interpretation;
+public interface IInterpretationConstraint;
+
+public abstract record class Interpretation
+{
+    public Interpretation Interpret() => this;
+}
 
 public record class NothingInterpretation : Interpretation, IStringInterpretable
 {
