@@ -7,7 +7,7 @@ using TheParser.Contracts;
 
 namespace TheParser.Parsing;
 
-public class AstBuilder(Lexer lexer, ICodeStream codeStream)
+public class Parser(Lexer lexer, ICodeStream codeStream)
 {
     private Token? _previous = null;
 
