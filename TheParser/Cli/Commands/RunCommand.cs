@@ -8,13 +8,13 @@ using TheParser.Contracts;
 
 namespace TheParser.Cli.Commands;
 
-[CommandName("interpret")]
-[CommandResource(Resource.InterpretDescription)]
+[CommandName("run")]
+[CommandResource(Resource.RunDescription)]
 [RequirePositionals("path")]
 [SupportedFlags("--debug")]
-public sealed class InterpretCommand : CliCommand
+public sealed class RunCommand : CliCommand
 {
-    public override Resource CommandDescription => Resource.InterpretDescription;
+    public override Resource CommandDescription => Resource.RunDescription;
 
     public override CliCommandResult Run(ArgumentsProvider provider)
     {
