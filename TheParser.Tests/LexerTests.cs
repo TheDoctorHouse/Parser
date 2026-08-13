@@ -76,11 +76,11 @@ public class LexerTests
         var lexer = new Lexer(cliCodeStream);
         for (int i = 0; i < tokenNumber; i++)
             lexer.NextToken();
-        
+
         Assert.Throws<Exception>(lexer.NextToken);
         Assert.Equal(position, cliCodeStream.Position);
     }
-    
+
     [Fact]
     public void Peek_DoesNotAdvanceLexer()
     {
@@ -98,7 +98,7 @@ public class LexerTests
         var actual = lexer.NextToken();
 
         Assert.Equal(peeked, actual);
-        
+
         lexer.Peek();
     }
 }

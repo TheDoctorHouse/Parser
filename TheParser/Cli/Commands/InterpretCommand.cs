@@ -30,7 +30,7 @@ public sealed class InterpretCommand : CliCommand
         string content = File.ReadAllText(filePath);
 
         ICodeStream cliCodeStream = new CliCodeStream(content);
-        Lexer lexer = new (cliCodeStream);
+        Lexer lexer = new(cliCodeStream);
 
         if (debug)
         {
@@ -49,13 +49,13 @@ public sealed class InterpretCommand : CliCommand
         }
 
         lexer.Reset();
-    
-        Parser parser = new (lexer, cliCodeStream);
+
+        Parser parser = new(lexer, cliCodeStream);
 
         Statement statement;
 
         statement = parser.Parse();
-        
+
         if (debug)
         {
             Console.WriteLine("\nAst builder: ");
@@ -67,7 +67,7 @@ public sealed class InterpretCommand : CliCommand
             Console.WriteLine("Interpreter: ");
         }
 
-        Interpreter interpreter = new ();
+        Interpreter interpreter = new();
 
         interpreter.InterpretStatement(statement);
 

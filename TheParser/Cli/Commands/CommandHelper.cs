@@ -36,7 +36,7 @@ public static class CommandHelper
             string[]? positionalNames = t.GetCustomAttribute<RequirePositionalsAttribute>()?.Names;
             string[]? optionalPositionalNames = t.GetCustomAttribute<OptionalPositionalsAttribute>()?.Names;
 
-            CommandType commandType = new (t, commandName, resourceName, supportedFlags, positionalNames, optionalPositionalNames);
+            CommandType commandType = new(t, commandName, resourceName, supportedFlags, positionalNames, optionalPositionalNames);
 
             s_commandTypes.Add(commandName, commandType);
         }

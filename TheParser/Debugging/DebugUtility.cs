@@ -7,7 +7,7 @@ public static class DebugUtility
 {
     private const int SHOW_LETTERS = 15;
 
-    public static string PingPosition(int position, ICodeStream codeStream) 
+    public static string PingPosition(int position, ICodeStream codeStream)
     {
         ArgumentOutOfRangeException.ThrowIfGreaterThan(position, codeStream.Length);
         ArgumentOutOfRangeException.ThrowIfZero(codeStream.Length);

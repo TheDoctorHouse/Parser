@@ -39,7 +39,7 @@ public class ArgumentsProvider(string[] arguments)
             var message = $"Missing one or more positional arguments.\nUsage: {CliHelper.BuildUsage(command)}";
             return CliCommandResult.IncorrectUsage(message);
         }
-        
+
         StringBuilder unexpectedArguments = new("Unexpected argument(s): ");
 
         bool wasUnexpectedArgument = false;
@@ -68,7 +68,7 @@ public class ArgumentsProvider(string[] arguments)
 
         if (wasUnexpectedArgument)
             return CliCommandResult.IncorrectUsage(unexpectedArguments.ToString());
-    
+
         return null;
     }
 }
