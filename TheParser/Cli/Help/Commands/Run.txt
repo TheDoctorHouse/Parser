@@ -12,4 +12,4 @@ Options:
   --debug     Enable debug output
 
 Example:
-  parser interpret ./code
+  parser run ./code

@@ -12,23 +12,23 @@ dotnet build
 
 ## Run a program
 
-Use the `interpret` command with the path to a source file:
+Use the `run` command with the path to a source file:
 
 ```powershell
-dotnet run --project TheParser -- interpret examples/hello.parser
+dotnet run --project TheParser -- run examples/hello.parser
 ```
 
 Add `--debug` to print the lexer tokens and abstract syntax tree before execution:
 
 ```powershell
-dotnet run --project TheParser -- interpret examples/arithmetic.parser --debug
+dotnet run --project TheParser -- run examples/arithmetic.parser --debug
 ```
 
 For the command-line help:
 
 ```powershell
 dotnet run --project TheParser -- help
-dotnet run --project TheParser -- help interpret
+dotnet run --project TheParser -- help run
 ```
 
 ## Language overview
@@ -72,10 +72,10 @@ Print("Hello, " + name + "!\n");
 The [`examples`](examples) directory contains runnable programs that demonstrate the language features:
 
 ```powershell
-dotnet run --project TheParser -- interpret examples/hello.parser
-dotnet run --project TheParser -- interpret examples/arithmetic.parser
-dotnet run --project TheParser -- interpret examples/variables.parser
-dotnet run --project TheParser -- interpret examples/input.parser
+dotnet run --project TheParser -- run examples/hello.parser
+dotnet run --project TheParser -- run examples/arithmetic.parser
+dotnet run --project TheParser -- run examples/variables.parser
+dotnet run --project TheParser -- run examples/input.parser
 ```
 
 `input.parser` waits for a line of input. The other examples run without interaction.
