@@ -1,24 +1,41 @@
-name: Tests
+name: CI
 
 on:
-  push:
   pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+      
+  workflow_dispatch:
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: true
 
 jobs:
-  test:
+  validate:
+    name: Validate
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - name: Check out source
+        uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: 10.0.x
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore TheParser.sln
+
+      - name: Build
+        run: dotnet build TheParser.sln --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test --no-restore
+        run: dotnet test --solution TheParser.sln --configuration Release --no-build --no-restore
+
+      - name: Verify formatting
+        run: dotnet format TheParser.sln --no-restore --verify-no-changes
