@@ -134,11 +134,6 @@ public class Interpreter
                 throw new OperationInterpretationException(interpretation, @operator);
         }
     }
-
-    private void InterpretExpressionStatement(ExpressionStatement es)
-    {
-        throw new NotImplementedException();
-    }
 }
 
 public class InterpretationException : Exception
