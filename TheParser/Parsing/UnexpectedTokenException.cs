@@ -1,5 +1,6 @@
 using TheParser.Lexing;
 using System.Text;
+using TheParser.Contracts;
 
 namespace TheParser.Parsing;
 
@@ -8,7 +9,7 @@ public class UnexpectedTokenException : Exception
     private readonly StringBuilder _builder;
 
     public override string Message => _builder.ToString();
-    public UnexpectedTokenException(Token unexpected) : this(unexpected, (Lexer?)null, null)
+    public UnexpectedTokenException(Token unexpected) : this(unexpected, (ICodeStream?)null, null)
     {
     }
 
@@ -23,14 +24,14 @@ public class UnexpectedTokenException : Exception
         _builder = sb;
     }
 
-    public UnexpectedTokenException(Token unexpected, Lexer? lexer, params TokenType[]? expected)
+    public UnexpectedTokenException(Token unexpected, ICodeStream? codeStream, params TokenType[]? expected)
     { 
         var sb = new StringBuilder();
 
         sb.AppendLine($"This token was not expected here:");
 
-        if (lexer != null)
-            unexpected.AppendDebugInfo(lexer, sb);
+        if (codeStream != null)
+            unexpected.AppendDebugInfo(codeStream, sb);
         else
             sb.AppendLine(unexpected.ToString());
 
@@ -53,7 +54,7 @@ public class UnexpectedTokenException : Exception
     }
 
     public UnexpectedTokenException(Token unexpected, string message, params TokenType[] expected)
-     : this(unexpected, (Lexer?)null, expected)
+     : this(unexpected, (ICodeStream?)null, expected)
     {
         _builder.AppendLine(message);
     }

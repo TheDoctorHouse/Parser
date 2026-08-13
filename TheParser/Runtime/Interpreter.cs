@@ -4,39 +4,6 @@ using TheParser.Lexing;
 
 namespace TheParser.Runtime;
 
-public interface IStringInterpretable
-{
-    StringInterpretation InterpretToString();
-}
-
-public abstract record class Interpretation;
-
-public record class NothingInterpretation : Interpretation, IStringInterpretable
-{
-    public StringInterpretation InterpretToString()
-    {
-        return new StringInterpretation("Nothing.");
-    }
-}
-
-public record class StringInterpretation(string Value) : Interpretation, IStringInterpretable
-{
-    public StringInterpretation InterpretToString()
-    {
-        return new StringInterpretation(Value);
-    }
-}
-
-public record class NumberInterpretation(double Value) : Interpretation, IStringInterpretable
-{
-    public StringInterpretation InterpretToString()
-    {
-        return new StringInterpretation(Value.ToString());
-    }
-}
-
-public record class NullInterpretation : Interpretation;
-
 public class Interpreter
 {
     private Dictionary<string, Interpretation> _variables = new();
@@ -53,11 +20,11 @@ public class Interpreter
                 InterpretExpression(es.Callee);
                 break;
             case VariableDeclarationStatement vds:
-                var interp = vds.initializer != null ?
-                 InterpretExpression(vds.initializer) : 
+                var interp = vds.Initializer != null ?
+                 InterpretExpression(vds.Initializer) : 
                  new NullInterpretation();
 
-                _variables.Add((string)vds.identifier.Value!, interp);
+                _variables.Add((string)vds.Identifier.Value!, interp);
                 break;
         }
     }

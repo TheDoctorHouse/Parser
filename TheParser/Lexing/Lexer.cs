@@ -1,21 +1,18 @@
 using TheParser.Debugging;
 using System.Text;
+using TheParser.Contracts;
 
 namespace TheParser.Lexing;
 
 public class Lexer
 {
-    public int CurrentPosition { get; private set; }
-
     public Token? Current { get; private set; }
 
-    public string Content => _content;
-    
-    private readonly string _content;
+    public ICodeStream _codeStream;
 
-    public Lexer(string content)
+    public Lexer(ICodeStream codeStream)
     {
-        _content = content;
+        _codeStream = codeStream;
     }
 
     public Token NextToken()
@@ -27,25 +24,23 @@ public class Lexer
 
     public Token Peek()
     {
-        var position = CurrentPosition;
+        var position = _codeStream.Position;
         var token = NextTokenInternal();
-        CurrentPosition = position;
+        _codeStream.Seek(position);
         return token;
     }
 
     public void Reset()
     {
-        CurrentPosition = 0;
+        _codeStream.Seek(0);
     }
 
     private Token NextTokenInternal()
     {
-        if (CurrentPosition >= _content.Length)
-        {
+        if (_codeStream.Current == null)
             return CreateToken(TokenType.EOF);
-        }
 
-        var currentChar = _content[CurrentPosition];
+        var currentChar = _codeStream.Current.Value;
 
         switch (currentChar)
         {
@@ -115,16 +110,14 @@ public class Lexer
 
     private string ParseString()
     {
-        int startingPosition = CurrentPosition;
+        int startingPosition = _codeStream.Position;
         char? currentChar = NextCharacter();
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new ();
         
         while (currentChar != null && currentChar.Value != '"')
         {
             // `\n` is currently the only escape sequence in the language. The more escape sequences will be added later.
-            if (currentChar.Value == '\\' 
-            && CurrentPosition + 1 != _content.Length 
-            && _content[CurrentPosition + 1] == 'n')
+            if (currentChar.Value == '\\' && TryPeek(out char c) && c == 'n')
             {
                 sb.Append('\n');
                 NextCharacter();
@@ -135,19 +128,30 @@ public class Lexer
                 sb.Append(currentChar.Value);
                 currentChar = NextCharacter();
             }
-            
         }
-
 
         if (!currentChar.HasValue)
         {
-            CurrentPosition = startingPosition;
+            _codeStream.Seek(startingPosition);
             throw Failure("Expected `\"`, got end of file.");
         }
 
         NextCharacter();
 
         return sb.ToString();
+    }
+
+    private bool TryPeek(out char c)
+    {
+        char? result = _codeStream.Peek();
+
+        c = default;
+
+        if (result is null)
+            return false;
+
+        c = result.Value;
+        return true;
     }
 
     private string ParseIdentifier(char? currentChar)
@@ -164,27 +168,21 @@ public class Lexer
 
     private Exception UnexpectedCharacterException(char character)
     {
-        return Failure($"Cannot resolve character '{character}', position {CurrentPosition}");
+        return Failure($"Cannot resolve character '{character}', position {_codeStream.Current}");
     }
 
     private Exception Failure(string message)
     {
-        string visualization = DebugUtility.PingPosition(CurrentPosition, _content);
+        string visualization = DebugUtility.PingPosition(_codeStream.Position, _codeStream);
         return new Exception(message + "\n" + visualization);
     }
     private Token CreateToken(TokenType type, object? value = null) => 
-        new Token(type, value, CurrentPosition);
+        new Token(type, value, _codeStream.Position);
 
     private char? NextCharacter()
     {
-        CurrentPosition++;
-        if (IsEndOfContent)
-            return null;
-
-        return _content[CurrentPosition];
+        return _codeStream.Next();
     }
-
-    public bool IsEndOfContent => CurrentPosition >= _content.Length; 
 
     private double ParseNumber(char? currentChar)
     {

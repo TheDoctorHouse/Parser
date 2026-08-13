@@ -8,4 +8,4 @@ public record BlockStatement(IReadOnlyList<Statement> Statements) : Statement;
 
 public record ExpressionStatement(Expr Callee) : Statement;
 
-public record VariableDeclarationStatement(Token identifier, Expr? initializer) : Statement;
+public record VariableDeclarationStatement(Token Identifier, Expr? Initializer) : Statement;

@@ -3,22 +3,15 @@ using TheParser.Lexing;
 using TheParser.Syntax;
 
 using System.Diagnostics;
+using TheParser.Contracts;
 
 namespace TheParser.Parsing;
 
-public class AstBuilder
+public class AstBuilder(Lexer lexer, ICodeStream codeStream)
 {
-    private readonly Lexer _lexer;
-
     private Token? _previous = null;
 
-    public Token Current => _lexer.Current ?? throw new InvalidOperationException("Current token is null.");
-    
-
-    public AstBuilder(Lexer lexer)
-    {
-        _lexer = lexer;
-    }
+    public Token Current => lexer.Current ?? throw new InvalidOperationException("Current token is null.");
 
     public BlockStatement ParseBlockStatement()
     {
@@ -75,7 +68,7 @@ public class AstBuilder
         {
             Token op = Current;
 
-            Debug.Assert(TokenUtility.IsOperator(op.TokenType), "expr is" + expr.ToString() + op.GetDebugInfo(_lexer));
+            Debug.Assert(TokenUtility.IsOperator(op.TokenType), "expr is" + expr.ToString() + op.GetDebugInfo(codeStream));
 
             Expr right = ParseTerm();
 
@@ -176,18 +169,18 @@ public class AstBuilder
     {
         return new UnexpectedTokenException(
             Current,
-            _lexer,
+            codeStream,
             expected
         );
     }
 
     private Token Next()
     {
-        _previous = _lexer.Current;
-        return _lexer.NextToken();
+        _previous = lexer.Current;
+        return lexer.NextToken();
     }
 
-    private Token Peek() => _lexer.Peek();
+    private Token Peek() => lexer.Peek();
 
     private Token Previous()
     {
@@ -199,7 +192,7 @@ public class AstBuilder
 
     private bool Match(params TokenType[] tokenTypes)
     {
-        var token = _lexer.Peek();
+        var token = lexer.Peek();
         foreach (var tokenType in tokenTypes)
         {
             if (token.TokenType == tokenType)
