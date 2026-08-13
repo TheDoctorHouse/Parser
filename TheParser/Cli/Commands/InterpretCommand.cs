@@ -54,8 +54,8 @@ public sealed class InterpretCommand : CliCommand
 
         Statement statement;
 
-        statement = parser.Parse();
-
+        statement = parser.ParseBlockStatement();
+        
         if (debug)
         {
             Console.WriteLine("\nAst builder: ");
