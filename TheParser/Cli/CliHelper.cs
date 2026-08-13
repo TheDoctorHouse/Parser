@@ -20,15 +20,15 @@ public static class CliHelper
 
     public static bool IsGeneralArgument(string arg) => s_generalArguments.Contains(arg);
 
-    public static string Read(Resource res, params object[] args) 
+    public static string Read(Resource res, params object[] args)
         => ReadResource(ResourceToString(res), args);
 
     private static string ReadResource(string name, params object[] args)
-    {   
+    {
         string resourceName = $"{ResourcePrefix}.{name}.txt";
         var assembly = Assembly.GetExecutingAssembly();
 
-        using var stream = assembly.GetManifestResourceStream(resourceName) 
+        using var stream = assembly.GetManifestResourceStream(resourceName)
             ?? throw new InvalidOperationException($"Resource '{resourceName}' was not found.");
 
         using var reader = new StreamReader(stream);

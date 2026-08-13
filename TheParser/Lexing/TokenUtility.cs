@@ -1,6 +1,6 @@
 namespace TheParser.Lexing;
 
-public static class TokenUtility 
+public static class TokenUtility
 {
     public static string OperatorToString(TokenType tokenType)
     {

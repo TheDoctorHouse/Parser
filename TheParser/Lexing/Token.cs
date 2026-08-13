@@ -19,7 +19,7 @@ public record Token(TokenType TokenType, object? Value, int Position)
 
     public string GetDebugInfo(ICodeStream codeStream)
     {
-        StringBuilder sb = new ();
+        StringBuilder sb = new();
         AppendDebugInfo(codeStream, sb);
         return sb.ToString();
     }

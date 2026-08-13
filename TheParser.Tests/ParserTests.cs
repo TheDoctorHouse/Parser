@@ -22,7 +22,7 @@ public class ParserTests
         var astBuilder = new AstBuilder(lexer, codeStream);
         return astBuilder.ParseBlockStatement();
     }
-    
+
     [Fact]
     public void Parse_MultiplicationHasHigherPrecedenceThanAddition()
     {

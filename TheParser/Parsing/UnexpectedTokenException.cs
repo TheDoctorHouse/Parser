@@ -25,7 +25,7 @@ public class UnexpectedTokenException : Exception
     }
 
     public UnexpectedTokenException(Token unexpected, ICodeStream? codeStream, params TokenType[]? expected)
-    { 
+    {
         var sb = new StringBuilder();
 
         sb.AppendLine($"This token was not expected here:");
@@ -46,10 +46,10 @@ public class UnexpectedTokenException : Exception
                     sb.Append('.');
                 else
                     sb.Append(',');
-                    sb.Append(' ');
+                sb.Append(' ');
             }
         }
-    
+
         _builder = sb;
     }
 
