@@ -34,7 +34,7 @@ public class CliCodeStream(string content) : ICodeStream
         ArgumentOutOfRangeException.ThrowIfGreaterThan(position, Length);
 
         Position = position;
-        
+
         if (position >= content.Length)
         {
             Current = default;

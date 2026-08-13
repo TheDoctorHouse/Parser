@@ -21,7 +21,7 @@ public class Interpreter
                 break;
             case VariableDeclarationStatement vds:
                 var interp = vds.Initializer != null ?
-                 InterpretExpression(vds.Initializer) : 
+                 InterpretExpression(vds.Initializer) :
                  new NullInterpretation();
 
                 _variables.Add((string)vds.Identifier.Value!, interp);
@@ -31,10 +31,10 @@ public class Interpreter
 
     private Interpretation InterpretExpression(Expr expr)
     {
-        switch(expr)
+        switch (expr)
         {
             case CallExpression ce:
-                if (ce.Callee is not IdentifierExpression functionIdent) 
+                if (ce.Callee is not IdentifierExpression functionIdent)
                     throw new NotImplementedException();
 
                 string identString = functionIdent.Identifier;
@@ -46,7 +46,7 @@ public class Interpreter
                     case "Print":
                         if (ce.Arguments.Count != 1)
                             throw new InterpretationException($"Expected 1 argument, got {ce.Arguments.Count}");
-                        
+
                         Interpretation interpretation = InterpretExpression(ce.Arguments[0]);
 
                         string output;
@@ -59,13 +59,13 @@ public class Interpreter
 
                         return new NothingInterpretation();
                     case "Ask":
-                        if (ce.Arguments.Count != 0)    
+                        if (ce.Arguments.Count != 0)
                             throw new InterpretationException($"Expected 0 arguments, got {ce.Arguments.Count}");
-                        
+
                         string input = Console.ReadLine() ?? "Nothing.";
                         return new StringInterpretation(input);
                     case "ConvertToNumber":
-                        if (ce.Arguments.Count != 1)    
+                        if (ce.Arguments.Count != 1)
                             throw new InterpretationException($"Expected 1 argument, got {ce.Arguments.Count}");
 
                         Interpretation stringInterp = InterpretExpression(ce.Arguments[0]);
@@ -157,8 +157,10 @@ public class InterpretationException : Exception
 public class OperationInterpretationException : InterpretationException
 {
     public OperationInterpretationException(Interpretation left, TokenType @operator, Interpretation right) :
-     base($"Cannot solve binary operation `{left.GetType().Name} {@operator} {right.GetType().Name}") {}
+     base($"Cannot solve binary operation `{left.GetType().Name} {@operator} {right.GetType().Name}")
+    { }
 
     public OperationInterpretationException(Interpretation left, TokenType @operator) :
-     base($"Cannot solve unary operation `{@operator} {left.GetType().Name}") {}
+     base($"Cannot solve unary operation `{@operator} {left.GetType().Name}")
+    { }
 }

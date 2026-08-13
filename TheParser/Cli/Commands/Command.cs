@@ -18,7 +18,7 @@ public abstract class CliCommand
 public readonly struct CliCommandResult
 {
     private const int SUCCESS = 0;
-    private const int FAIL = 1; 
+    private const int FAIL = 1;
     private const int INCORRECT_USAGE = 2;
 
     public int ResultCode { get; }
@@ -32,11 +32,11 @@ public readonly struct CliCommandResult
         Exception = exception;
     }
 
-    public static CliCommandResult IncorrectUsage(string description) => new (INCORRECT_USAGE, description, null);
-   
-    public static CliCommandResult Fail(Exception ex) => new (FAIL, null, ex);
+    public static CliCommandResult IncorrectUsage(string description) => new(INCORRECT_USAGE, description, null);
 
-    public static CliCommandResult Success() => new (SUCCESS, null, null);
+    public static CliCommandResult Fail(Exception ex) => new(FAIL, null, ex);
+
+    public static CliCommandResult Success() => new(SUCCESS, null, null);
 
     public int AcknowledgeUser()
     {

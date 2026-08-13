@@ -20,7 +20,7 @@ public class AstPrinter
     {
         _depth += depthIncrement;
         HandlePersonality(statement);
-    
+
         switch (statement)
         {
             case BlockStatement bs:
@@ -43,7 +43,7 @@ public class AstPrinter
                 else
                     AppendMessage("No initializer");
                 break;
-            default: 
+            default:
                 throw new InvalidOperationException($"Unexpected statement type: `{statement.GetType().FullName}`");
         }
 
@@ -54,7 +54,7 @@ public class AstPrinter
     {
         _depth += depthIncrement;
         HandlePersonality(ast);
-        
+
         switch (ast)
         {
             case NumberExpression:

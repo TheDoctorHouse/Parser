@@ -42,7 +42,7 @@ public class Parser(Lexer lexer, ICodeStream codeStream)
             return new VariableDeclarationStatement(identifier, null);
 
         ConsumeOrFail(TokenType.Equals);
-        
+
         var expr = ParseExpression();
         ConsumeOrFail(TokenType.Semicolon);
 
@@ -62,7 +62,7 @@ public class Parser(Lexer lexer, ICodeStream codeStream)
     {
         // Keep additive operators at this level so ParseTerm gives * and /
         // higher precedence than + and -.
-        Expr expr = ParseTerm();       
+        Expr expr = ParseTerm();
 
         while (Match(TokenType.Plus, TokenType.Minus))
         {
@@ -165,7 +165,7 @@ public class Parser(Lexer lexer, ICodeStream codeStream)
     }
 
 
-    private UnexpectedTokenException UnexpectedToken(params TokenType[] expected) 
+    private UnexpectedTokenException UnexpectedToken(params TokenType[] expected)
     {
         return new UnexpectedTokenException(
             Current,

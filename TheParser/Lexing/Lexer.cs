@@ -112,8 +112,8 @@ public class Lexer
     {
         int startingPosition = _codeStream.Position;
         char? currentChar = NextCharacter();
-        StringBuilder sb = new ();
-        
+        StringBuilder sb = new();
+
         while (currentChar != null && currentChar.Value != '"')
         {
             // `\n` is currently the only escape sequence in the language. The more escape sequences will be added later.
@@ -176,7 +176,7 @@ public class Lexer
         string visualization = DebugUtility.PingPosition(_codeStream.Position, _codeStream);
         return new Exception(message + "\n" + visualization);
     }
-    private Token CreateToken(TokenType type, object? value = null) => 
+    private Token CreateToken(TokenType type, object? value = null) =>
         new Token(type, value, _codeStream.Position);
 
     private char? NextCharacter()
