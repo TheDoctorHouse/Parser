@@ -1,12 +1,19 @@
 using System.Diagnostics;
 using TheParser.Syntax;
 using TheParser.Lexing;
+using TheParser.Runtime.Functions;
 
 namespace TheParser.Runtime;
 
 public class Interpreter
 {
     private Dictionary<string, Interpretation> _variables = new();
+    private Dictionary<string, IFunction> _functions;
+
+    public Interpreter()
+    {
+        _functions = BuiltInFunctionScanner.ScanAndCreateBuiltInFunctions();
+    }
 
     public void InterpretStatement(Statement statement)
     {
@@ -29,7 +36,7 @@ public class Interpreter
         }
     }
 
-    private Interpretation InterpretExpression(Expr expr)
+    public Interpretation InterpretExpression(Expr expr)
     {
         switch (expr)
         {
@@ -39,46 +46,31 @@ public class Interpreter
 
                 string identString = functionIdent.Identifier;
 
-                // Built-ins are dispatched here until the language supports
-                // user-defined functions and a callable environment.
-                switch (identString)
+                if (!_functions.TryGetValue(identString, out IFunction? func))
+                    throw new InterpretationException($"Cannot resolve function call `{identString}`");
+
+                var parameters = func.GetParameterTypes();
+
+                if (parameters.Count != ce.Arguments.Count)
+                    throw new InterpretationException(
+                        $"Expected {parameters.Count} argument(s), got {ce.Arguments.Count}."
+                        );
+
+                List<Interpretation> arguments = [];
+
+                for (int i = 0; i < parameters.Count; i++)
                 {
-                    case "Print":
-                        if (ce.Arguments.Count != 1)
-                            throw new InterpretationException($"Expected 1 argument, got {ce.Arguments.Count}");
+                    var requiredType = parameters[i];
+                    var evaluated = InterpretExpression(ce.Arguments[i]);
+                    var evaluatedType = evaluated.GetType();
 
-                        Interpretation interpretation = InterpretExpression(ce.Arguments[0]);
+                    if (!requiredType.IsAssignableFrom(evaluatedType))
+                        throw new InterpretationException($"Expected {requiredType.FullName}, got {evaluatedType.FullName}.");
 
-                        string output;
-                        if (interpretation is not IStringInterpretable si)
-                            output = $"[Interpretation of type {interpretation.GetType().Name}]";
-                        else
-                            output = si.InterpretToString().Value;
-
-                        Console.Write(output);
-
-                        return new NothingInterpretation();
-                    case "Ask":
-                        if (ce.Arguments.Count != 0)
-                            throw new InterpretationException($"Expected 0 arguments, got {ce.Arguments.Count}");
-
-                        string input = Console.ReadLine() ?? "Nothing.";
-                        return new StringInterpretation(input);
-                    case "ConvertToNumber":
-                        if (ce.Arguments.Count != 1)
-                            throw new InterpretationException($"Expected 1 argument, got {ce.Arguments.Count}");
-
-                        Interpretation stringInterp = InterpretExpression(ce.Arguments[0]);
-                        if (stringInterp is not StringInterpretation se)
-                            throw new InterpretationException($"Expected string interpretation, got {ce.Arguments[0].GetType().FullName}");
-
-                        if (!double.TryParse(se.Value, out double val))
-                            throw new InterpretationException($"Failed to parse integer.");
-
-                        return new NumberInterpretation(val);
-                    default:
-                        throw new InterpretationException($"Cannot resolve function call `{identString}`");
+                    arguments.Add(evaluated);
                 }
+
+                return func.Invoke(arguments);
             case StringExpression se:
                 return new StringInterpretation(se.Value);
             case NumberExpression ne:
