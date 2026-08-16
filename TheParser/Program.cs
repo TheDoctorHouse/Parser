@@ -1,5 +1,6 @@
 ﻿using TheParser.Cli;
 using TheParser.Cli.Commands;
+using TheParser.Debugging.Exceptions;
 
 if (args.Length == 0)
 {
@@ -36,7 +37,7 @@ try
 
     return command.Run(argumentsProvider).AcknowledgeUser();
 }
-catch (Exception ex)
+catch (LanguageException ex)
 {
     var failResult = CliCommandResult.Fail(ex);
     int result = failResult.AcknowledgeUser();
@@ -47,4 +48,11 @@ catch (Exception ex)
         Console.WriteLine($"Stack trace:\n{ex.StackTrace}");
 
     return result;
+}
+catch (Exception ex)
+{
+    Console.Error.WriteLine("Failed with an internal exception.");
+    Console.Error.WriteLine(ex);
+
+    return CliCommandResult.FAIL;
 }

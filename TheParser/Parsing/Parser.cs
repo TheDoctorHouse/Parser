@@ -4,6 +4,7 @@ using TheParser.Syntax;
 
 using System.Diagnostics;
 using TheParser.Contracts;
+using TheParser.Parsing.Exceptions;
 
 namespace TheParser.Parsing;
 
@@ -168,8 +169,7 @@ public class Parser(Lexer lexer, ICodeStream codeStream)
     private UnexpectedTokenException UnexpectedToken(params TokenType[] expected)
     {
         return new UnexpectedTokenException(
-            Current,
-            codeStream,
+            Current.TokenType,
             expected
         );
     }
