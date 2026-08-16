@@ -2,6 +2,7 @@ using System.Diagnostics;
 using TheParser.Syntax;
 using TheParser.Lexing;
 using TheParser.Runtime.Functions;
+using TheParser.Runtime.Exceptions;
 
 namespace TheParser.Runtime;
 
@@ -47,12 +48,12 @@ public class Interpreter
                 string identString = functionIdent.Identifier;
 
                 if (!_functions.TryGetValue(identString, out IFunction? func))
-                    throw new InterpretationException($"Cannot resolve function call `{identString}`");
+                    throw new UnresolvedFunctionException(identString);
 
                 var parameters = func.GetParameterTypes();
 
                 if (parameters.Count != ce.Arguments.Count)
-                    throw new InterpretationException(
+                    throw new InvalidArgumentsException(
                         $"Expected {parameters.Count} argument(s), got {ce.Arguments.Count}."
                         );
 
@@ -65,7 +66,7 @@ public class Interpreter
                     var evaluatedType = evaluated.GetType();
 
                     if (!requiredType.IsAssignableFrom(evaluatedType))
-                        throw new InterpretationException($"Expected {requiredType.FullName}, got {evaluatedType.FullName}.");
+                        throw new InvalidArgumentsException($"Expected {requiredType.FullName}, got {evaluatedType.FullName}.");
 
                     arguments.Add(evaluated);
                 }
@@ -81,7 +82,7 @@ public class Interpreter
                 return SolveUnaryOperation(InterpretExpression(ue.Expr), ue.Operator);
             case IdentifierExpression ie:
                 if (!_variables.TryGetValue(ie.Identifier, out var interp))
-                    throw new InterpretationException($"No such declaration `{ie.Identifier}`");
+                    throw new UnresolvedVariableException(ie.Identifier);
                 return interp;
             default:
                 throw new NotImplementedException($"Interpretation of expression `{expr.GetType().Name}` is not implemented.");
@@ -136,18 +137,3 @@ public class Interpreter
     }
 }
 
-public class InterpretationException : Exception
-{
-    public InterpretationException(string message) : base(message) { }
-}
-
-public class OperationInterpretationException : InterpretationException
-{
-    public OperationInterpretationException(Interpretation left, TokenType @operator, Interpretation right) :
-     base($"Cannot solve binary operation `{left.GetType().Name} {@operator} {right.GetType().Name}")
-    { }
-
-    public OperationInterpretationException(Interpretation left, TokenType @operator) :
-     base($"Cannot solve unary operation `{@operator} {left.GetType().Name}")
-    { }
-}

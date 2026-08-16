@@ -1,6 +1,6 @@
-using TheParser.Debugging;
 using System.Text;
 using TheParser.Contracts;
+using TheParser.Lexing.Exceptions;
 
 namespace TheParser.Lexing;
 
@@ -102,8 +102,9 @@ public class Lexer
             return CreateToken(TokenType.String, value);
         }
 
-
-        throw UnexpectedCharacterException(currentChar);
+        throw new UnexpectedCharacterException(
+            $"Cannot resolve character '{currentChar}', position {_codeStream.Current}"
+            );
     }
 
     private static bool IsLetter(char c) => c is >= 'a' and <= 'z' or >= 'A' and <= 'Z';
@@ -133,7 +134,7 @@ public class Lexer
         if (!currentChar.HasValue)
         {
             _codeStream.Seek(startingPosition);
-            throw Failure("Expected `\"`, got end of file.");
+            throw new UnexpectedCharacterException("Expected `\"`, got end of file.");
         }
 
         NextCharacter();
@@ -166,16 +167,6 @@ public class Lexer
         return sb.ToString();
     }
 
-    private Exception UnexpectedCharacterException(char character)
-    {
-        return Failure($"Cannot resolve character '{character}', position {_codeStream.Current}");
-    }
-
-    private Exception Failure(string message)
-    {
-        string visualization = DebugUtility.PingPosition(_codeStream.Position, _codeStream);
-        return new Exception(message + "\n" + visualization);
-    }
     private Token CreateToken(TokenType type, object? value = null) =>
         new Token(type, value, _codeStream.Position);
 

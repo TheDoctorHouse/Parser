@@ -17,9 +17,9 @@ public abstract class CliCommand
 
 public readonly struct CliCommandResult
 {
-    private const int SUCCESS = 0;
-    private const int FAIL = 1;
-    private const int INCORRECT_USAGE = 2;
+    public const int SUCCESS = 0;
+    public const int FAIL = 1;
+    public const int INCORRECT_USAGE = 2;
 
     public int ResultCode { get; }
     public string? Description { get; }
