@@ -1,3 +1,4 @@
 {
-    "dotnet.defaultSolution": "TheParser.sln"
+    "dotnet.defaultSolution": "TheParser.sln",
+    "editor.rulers": [120]
 }
