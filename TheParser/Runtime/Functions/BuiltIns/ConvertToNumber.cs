@@ -1,3 +1,4 @@
+using TheParser.Runtime.Exceptions;
 using TheParser.Runtime.Functions.Attributes;
 
 namespace TheParser.Runtime.Functions.BuiltIns;
@@ -10,7 +11,7 @@ public class ConvertToNumber : BuiltInFunction
         var input = (StringInterpretation)arguments[0];
 
         if (!double.TryParse(input.Value, out double val))
-            throw new InterpretationException($"Failed to parse integer.");
+            throw new NumberConversionException($"Failed to parse integer.");
 
         return new NumberInterpretation(val);
     }

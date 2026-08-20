@@ -1,5 +1,6 @@
 using TheParser.Cli;
 using TheParser.Lexing;
+using TheParser.Lexing.Exceptions;
 
 namespace TheParser.Tests;
 
@@ -70,14 +71,14 @@ public class LexerTests
     [InlineData("123 %", 4, 1)]
     [InlineData("@a = Foo(\"bar\")\\;", 15, 7)]
     [InlineData("$", 0, 0)]
-    public void NextToken_UnexpectedCharacter_ThrowsUnexpectedCharacter(string input, int position, int tokenNumber)
+    public void NextToken_UnexpectedCharacter_ThrowsUnexpectedCharacterException(string input, int position, int tokenNumber)
     {
         var cliCodeStream = new CliCodeStream(input);
         var lexer = new Lexer(cliCodeStream);
         for (int i = 0; i < tokenNumber; i++)
             lexer.NextToken();
 
-        Assert.Throws<Exception>(lexer.NextToken);
+        Assert.Throws<UnexpectedCharacterException>(lexer.NextToken);
         Assert.Equal(position, cliCodeStream.Position);
     }
 

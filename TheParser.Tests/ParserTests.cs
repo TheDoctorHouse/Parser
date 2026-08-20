@@ -1,6 +1,7 @@
 using TheParser.Cli;
 using TheParser.Lexing;
 using TheParser.Parsing;
+using TheParser.Parsing.Exceptions;
 using TheParser.Syntax;
 
 namespace TheParser.Tests;
