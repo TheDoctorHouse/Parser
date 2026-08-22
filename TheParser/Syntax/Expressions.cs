@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace TheParser.Syntax;
 
-public abstract record class Expr;
+public abstract record class Expr(SourceSpan Span);
 
 public interface IPrintableInformator
 {
@@ -16,9 +16,17 @@ public record class BinaryExpression : Expr, IPrintableInformator
     public TokenType Operator { get; }
     public Expr Right { get; }
 
-    public BinaryExpression(Expr left, TokenType @operator, Expr right)
+    public BinaryExpression(
+        Expr left,
+        TokenType @operator,
+        Expr right,
+        SourceSpan span)
+         : base(span)
     {
-        Debug.Assert(TokenUtility.IsOperator(@operator), "Expected operator, got " + @operator + '.');
+        Debug.Assert(
+            TokenUtility.IsOperator(@operator),
+            "Expected operator, got " + @operator + '.');
+
         Left = left;
         Operator = @operator;
         Right = right;
@@ -30,7 +38,7 @@ public record class BinaryExpression : Expr, IPrintableInformator
     }
 }
 
-public record class NumberExpression(double Value) : Expr, IPrintableInformator
+public record class NumberExpression(double Value, SourceSpan Span) : Expr(Span), IPrintableInformator
 {
     public string GetInformation()
     {
@@ -38,7 +46,7 @@ public record class NumberExpression(double Value) : Expr, IPrintableInformator
     }
 }
 
-public record class StringExpression(string Value) : Expr, IPrintableInformator
+public record class StringExpression(string Value, SourceSpan Span) : Expr(Span), IPrintableInformator
 {
     public string GetInformation()
     {
@@ -46,7 +54,7 @@ public record class StringExpression(string Value) : Expr, IPrintableInformator
     }
 }
 
-public record class UnaryExpression(Expr Expr, TokenType Operator) : Expr, IPrintableInformator
+public record class UnaryExpression(Expr Expr, TokenType Operator, SourceSpan Span) : Expr(Span), IPrintableInformator
 {
     public string GetInformation()
     {
@@ -54,7 +62,7 @@ public record class UnaryExpression(Expr Expr, TokenType Operator) : Expr, IPrin
     }
 }
 
-public record class IdentifierExpression(string Identifier) : Expr, IPrintableInformator
+public record class IdentifierExpression(string Identifier, SourceSpan Span) : Expr(Span), IPrintableInformator
 {
     public string GetInformation()
     {
@@ -62,4 +70,4 @@ public record class IdentifierExpression(string Identifier) : Expr, IPrintableIn
     }
 }
 
-public record class CallExpression(Expr Callee, IReadOnlyList<Expr> Arguments) : Expr;
+public record class CallExpression(Expr Callee, IReadOnlyList<Expr> Arguments, SourceSpan Span) : Expr(Span);

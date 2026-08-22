@@ -12,7 +12,7 @@ public class ParserTests
     {
         var codeStream = new CliCodeStream(content);
         var lexer = new Lexer(codeStream);
-        var astBuilder = new Parser(lexer, codeStream);
+        var astBuilder = new Parser(lexer);
         return astBuilder.ParseExpression();
     }
 
@@ -20,7 +20,7 @@ public class ParserTests
     {
         var codeStream = new CliCodeStream(content);
         var lexer = new Lexer(codeStream);
-        var astBuilder = new Parser(lexer, codeStream);
+        var astBuilder = new Parser(lexer);
         return astBuilder.ParseBlockStatement();
     }
 

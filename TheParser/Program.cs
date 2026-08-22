@@ -1,5 +1,6 @@
 ﻿using TheParser.Cli;
 using TheParser.Cli.Commands;
+using TheParser.Debugging;
 using TheParser.Debugging.Exceptions;
 
 if (args.Length == 0)
@@ -37,21 +38,9 @@ try
 
     return command.Run(argumentsProvider).AcknowledgeUser();
 }
-catch (LanguageException ex)
-{
-    var failResult = CliCommandResult.Fail(ex);
-    int result = failResult.AcknowledgeUser();
-    bool showStackTrace = args.Contains("--stacktrace");
-    if (!showStackTrace)
-        Console.WriteLine("Use --stacktrace argument to show stacktrace.");
-    else
-        Console.WriteLine($"Stack trace:\n{ex.StackTrace}");
-
-    return result;
-}
 catch (Exception ex)
 {
-    Console.Error.WriteLine("Failed with an internal exception.");
+    Console.Error.WriteLine("Program: Failed with an internal exception.");
     Console.Error.WriteLine(ex);
 
     return CliCommandResult.FAIL;

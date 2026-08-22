@@ -1,62 +1,79 @@
-namespace TheParser.Debugging;
-
+using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using TheParser.Contracts;
+using TheParser.Syntax;
+
+namespace TheParser.Debugging;
 
 public static class DebugUtility
 {
     private const int SHOW_LETTERS = 15;
 
-    public static string PingPosition(int position, ICodeStream codeStream)
+    public static string PingPosition(ICodeStream codeStream, SourceSpan span)
     {
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(position, codeStream.Length);
-        ArgumentOutOfRangeException.ThrowIfZero(codeStream.Length);
+        int start = span.Start;
+        int end = span.Start + span.Length;
 
-        if (position == codeStream.Length)
-            position--;
+        if (end > codeStream.Length || start < 0)
+            throw new ArgumentOutOfRangeException(nameof(span));
 
         var sb = new StringBuilder();
 
-        string line = codeStream.GetLine(position);
+        int contentStart = Math.Max(0, start - SHOW_LETTERS);
+        int contentEnd = Math.Min(codeStream.Length, end + SHOW_LETTERS);
 
-        int lineStart = codeStream.GetLineStart(position);
-        int relativePosition = position - lineStart;
+        codeStream.Seek(contentStart - 1);
 
-        int start = Math.Max(0, relativePosition - SHOW_LETTERS);
-        int end = Math.Min(line.Length, relativePosition + SHOW_LETTERS + 1);
+        sb.Append("...");
 
-        int arrowCol = relativePosition - start;
-
-        bool sliceStart = start > 0;
-        bool sliceEnd = end < line.Length - 1;
-
-        if (sliceStart)
+        bool firstLine = true;
+        int i = contentStart;
+        while (i < contentEnd)
         {
-            sb.Append("...");
-            arrowCol += 3;
+            int lineStart = i;
+            for (; i <= contentEnd; i++)
+            {
+                var next = codeStream.Next();
+                if (next == null)
+                    continue;
+
+                if (next.Value == '\r')
+                    continue;
+
+                if (next.Value == '\n')
+                {
+                    i++;
+                    break;
+                }
+
+                sb.Append(next.Value);
+            }
+
+            sb.AppendLine();
+            if (firstLine)
+                sb.Append("   ");
+
+            for (int j = lineStart; j < i; j++)
+            {
+                int prevState = codeStream.Position;
+                // todo: simplify ICodeStream so that random access becomes easier.
+                // temporary hack
+                codeStream.Seek(j);
+                bool isWhiteSpace = codeStream.Current.HasValue && char.IsWhiteSpace(codeStream.Current.Value);
+                codeStream.Seek(prevState);
+                if (isWhiteSpace)
+                    sb.Append(' ');
+                else if (j >= start && j < end)
+                    sb.Append('^');
+                else
+                    sb.Append(' ');
+            }
+
+            sb.AppendLine();
+            firstLine = false;
         }
 
-        sb.Append(line[start..end]);
-
-        if (sliceEnd)
-            sb.Append("...");
-
-        AppendWhitespaces(sb, arrowCol);
-        sb.Append('^');
-        AppendWhitespaces(sb, arrowCol);
-        sb.Append('|');
-        AppendWhitespaces(sb, arrowCol);
-        sb.Append('|');
-        AppendWhitespaces(sb, Math.Max(0, arrowCol - 2));
-        sb.Append("HERE");
-
+        sb.Append("...");
         return sb.ToString();
-    }
-
-    private static void AppendWhitespaces(StringBuilder sb, int count)
-    {
-        sb.AppendLine();
-        for (int i = 0; i < count; i++)
-            sb.Append(' ');
     }
 }

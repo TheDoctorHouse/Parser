@@ -1,0 +1,3 @@
+@notANumber = "123;";
+
+@fails = ConvertToNumber(notANumber);

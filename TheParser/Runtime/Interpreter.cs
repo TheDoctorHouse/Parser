@@ -42,54 +42,66 @@ public class Interpreter
         switch (expr)
         {
             case CallExpression ce:
-                if (ce.Callee is not IdentifierExpression functionIdent)
-                    throw new NotImplementedException();
-
-                string identString = functionIdent.Identifier;
-
-                if (!_functions.TryGetValue(identString, out IFunction? func))
-                    throw new UnresolvedFunctionException(identString);
-
-                var parameters = func.GetParameterTypes();
-
-                if (parameters.Count != ce.Arguments.Count)
-                    throw new InvalidArgumentsException(
-                        $"Expected {parameters.Count} argument(s), got {ce.Arguments.Count}."
-                        );
-
-                List<Interpretation> arguments = [];
-
-                for (int i = 0; i < parameters.Count; i++)
-                {
-                    var requiredType = parameters[i];
-                    var evaluated = InterpretExpression(ce.Arguments[i]);
-                    var evaluatedType = evaluated.GetType();
-
-                    if (!requiredType.IsAssignableFrom(evaluatedType))
-                        throw new InvalidArgumentsException($"Expected {requiredType.FullName}, got {evaluatedType.FullName}.");
-
-                    arguments.Add(evaluated);
-                }
-
-                return func.Invoke(arguments);
+                return InvokeFunction(ce);
             case StringExpression se:
                 return new StringInterpretation(se.Value);
             case NumberExpression ne:
                 return new NumberInterpretation(ne.Value);
             case BinaryExpression be:
-                return SolveBinaryOperation(InterpretExpression(be.Left), be.Operator, InterpretExpression(be.Right));
+                return SolveBinaryOperation(InterpretExpression(be.Left), be.Operator, InterpretExpression(be.Right), be.Span);
             case UnaryExpression ue:
-                return SolveUnaryOperation(InterpretExpression(ue.Expr), ue.Operator);
+                return SolveUnaryOperation(InterpretExpression(ue.Expr), ue.Operator, ue.Span);
             case IdentifierExpression ie:
                 if (!_variables.TryGetValue(ie.Identifier, out var interp))
-                    throw new UnresolvedVariableException(ie.Identifier);
+                    throw new UnresolvedVariableException(ie.Identifier, ie.Span);
                 return interp;
             default:
                 throw new NotImplementedException($"Interpretation of expression `{expr.GetType().Name}` is not implemented.");
         }
     }
 
-    private Interpretation SolveBinaryOperation(Interpretation left, TokenType @operator, Interpretation right)
+    public Interpretation InvokeFunction(CallExpression ce)
+    {
+        if (ce.Callee is not IdentifierExpression functionIdent)
+            throw new NotImplementedException();
+
+        string identString = functionIdent.Identifier;
+
+        if (!_functions.TryGetValue(identString, out IFunction? func))
+            throw new UnresolvedFunctionException(identString, functionIdent.Span);
+
+        var parameters = func.GetParameterTypes();
+
+        if (parameters.Count != ce.Arguments.Count)
+            throw new InvalidArgumentsException(
+                $"Expected {parameters.Count} argument(s), got {ce.Arguments.Count}.",
+                ce.Span);
+
+        List<Interpretation> arguments = [];
+
+        for (int i = 0; i < parameters.Count; i++)
+        {
+            var requiredType = parameters[i];
+            var evaluated = InterpretExpression(ce.Arguments[i]);
+            var evaluatedType = evaluated.GetType();
+
+            if (!requiredType.IsAssignableFrom(evaluatedType))
+                throw new InvalidArgumentsException($"Expected {requiredType.FullName}, got {evaluatedType.FullName}.", ce.Arguments[i].Span);
+
+            arguments.Add(evaluated);
+        }
+
+        try
+        {
+            return func.Invoke(arguments);
+        }
+        catch (FunctionException fe)
+        {
+            throw new FunctionInvocationException("An error occured during function invocation.", ce.Span, fe);
+        }
+    }
+
+    private Interpretation SolveBinaryOperation(Interpretation left, TokenType @operator, Interpretation right, SourceSpan span)
     {
         Debug.Assert(TokenUtility.IsOperator(@operator));
 
@@ -104,7 +116,7 @@ public class Interpreter
                 string res = leftStr.InterpretToString().Value + rightStr.InterpretToString().Value;
                 return new StringInterpretation(res);
             default:
-                throw new OperationInterpretationException(left, @operator, right);
+                throw new OperationInterpretationException(left, @operator, right, span);
         }
     }
 
@@ -121,7 +133,7 @@ public class Interpreter
         };
     }
 
-    private Interpretation SolveUnaryOperation(Interpretation interpretation, TokenType @operator)
+    private Interpretation SolveUnaryOperation(Interpretation interpretation, TokenType @operator, SourceSpan span)
     {
         Debug.Assert(TokenUtility.IsOperator(@operator));
 
@@ -132,7 +144,7 @@ public class Interpreter
 
                 return new NumberInterpretation(result);
             default:
-                throw new OperationInterpretationException(interpretation, @operator);
+                throw new OperationInterpretationException(interpretation, @operator, span);
         }
     }
 }
