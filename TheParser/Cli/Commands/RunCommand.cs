@@ -5,6 +5,7 @@ using TheParser.Syntax;
 using TheParser.Debugging;
 using TheParser.Cli.Attributes;
 using TheParser.Contracts;
+using TheParser.Debugging.Exceptions;
 
 namespace TheParser.Cli.Commands;
 
@@ -34,7 +35,15 @@ public sealed class RunCommand : CliCommand
 
         if (debug)
         {
-            var token = lexer.NextToken();
+            Token token;
+            try
+            {
+                token = lexer.NextToken();
+            }
+            catch (LanguageException ex)
+            {
+                return CliCommandResult.Fail(ex, BuildFailMessage(ex, cliCodeStream));
+            }
             Console.WriteLine("Lexer:");
             while (token.TokenType != TokenType.EOF)
             {
@@ -42,7 +51,14 @@ public sealed class RunCommand : CliCommand
                     Console.Write($"{token.TokenType}({token.Value}) ");
                 else
                     Console.Write($"{token.TokenType} ");
-                token = lexer.NextToken();
+                try
+                {
+                    token = lexer.NextToken();
+                }
+                catch (LanguageException ex)
+                {
+                    return CliCommandResult.Fail(ex, BuildFailMessage(ex, cliCodeStream));
+                }
             }
 
             Console.Write(token.TokenType);
@@ -50,11 +66,18 @@ public sealed class RunCommand : CliCommand
 
         lexer.Reset();
 
-        Parser parser = new(lexer, cliCodeStream);
+        Parser parser = new(lexer);
 
         Statement statement;
 
-        statement = parser.ParseBlockStatement();
+        try
+        {
+            statement = parser.ParseBlockStatement();
+        }
+        catch (LanguageException ex)
+        {
+            return CliCommandResult.Fail(ex, BuildFailMessage(ex, cliCodeStream));
+        }
 
         if (debug)
         {
@@ -69,8 +92,23 @@ public sealed class RunCommand : CliCommand
 
         Interpreter interpreter = new();
 
-        interpreter.InterpretStatement(statement);
+        try
+        {
+            interpreter.InterpretStatement(statement);
+        }
+        catch (LanguageException ex)
+        {
+            return CliCommandResult.Fail(ex, BuildFailMessage(ex, cliCodeStream));
+        }
 
         return CliCommandResult.Success();
+    }
+
+    private static string BuildFailMessage(LanguageException ex, ICodeStream codeStream)
+    {
+        string message = DebugUtility.PingPosition(codeStream, ex.Span);
+        var pos = ex.Span.Start;
+        message += $"\nLine {codeStream.GetLineNumber(pos) + 1}, position {pos - codeStream.GetLineStart(pos) + 1}.";
+        return message;
     }
 }

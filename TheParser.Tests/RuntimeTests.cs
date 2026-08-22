@@ -85,7 +85,7 @@ public class RuntimeTests
     {
         ICodeStream codeStream = new CliCodeStream(input);
         Lexer lexer = new(codeStream);
-        Parser parser = new(lexer, codeStream);
+        Parser parser = new(lexer);
 
         return parser.ParseBlockStatement();
     }

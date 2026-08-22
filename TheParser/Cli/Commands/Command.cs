@@ -34,7 +34,7 @@ public readonly struct CliCommandResult
 
     public static CliCommandResult IncorrectUsage(string description) => new(INCORRECT_USAGE, description, null);
 
-    public static CliCommandResult Fail(Exception ex) => new(FAIL, null, ex);
+    public static CliCommandResult Fail(Exception ex, string? description = null) => new(FAIL, description, ex);
 
     public static CliCommandResult Success() => new(SUCCESS, null, null);
 
@@ -43,7 +43,11 @@ public readonly struct CliCommandResult
         switch (ResultCode)
         {
             case FAIL:
-                Console.Error.WriteLine($"Failed with an exception.\n{Exception!.GetType().FullName}\n\n\n{Exception.Message}");
+                Console.Error.WriteLine(
+                    $"Failed with an exception.\n{Exception!.GetType().FullName}\n\n\n{Exception.Message}"
+                    );
+                if (Description != null)
+                    Console.Error.WriteLine(Description);
                 break;
             case INCORRECT_USAGE:
                 Console.Error.WriteLine($"Incorrect usage: {Description}\nSee parser help <command> for more information.");

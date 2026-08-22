@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using TheParser.Contracts;
 
 namespace TheParser.Cli;
@@ -30,14 +29,11 @@ public class CliCodeStream(string content) : ICodeStream
 
     public void Seek(int position)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(position, 0);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(position, Length);
-
         Position = position;
 
-        if (position >= content.Length)
+        if (position >= content.Length || position < 0)
         {
-            Current = default;
+            Current = null;
             return;
         }
 

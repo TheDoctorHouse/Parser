@@ -1,6 +1,7 @@
 using System.Text;
 using TheParser.Contracts;
 using TheParser.Lexing.Exceptions;
+using TheParser.Syntax;
 
 namespace TheParser.Lexing;
 
@@ -103,8 +104,14 @@ public class Lexer
         }
 
         throw new UnexpectedCharacterException(
-            $"Cannot resolve character '{currentChar}', position {_codeStream.Current}"
+            $"Cannot resolve character '{currentChar}'.",
+            CreateSpan()
             );
+    }
+
+    public SourceSpan CreateSpan()
+    {
+        return new SourceSpan(_codeStream.Position, 1);
     }
 
     private static bool IsLetter(char c) => c is >= 'a' and <= 'z' or >= 'A' and <= 'Z';
@@ -134,7 +141,7 @@ public class Lexer
         if (!currentChar.HasValue)
         {
             _codeStream.Seek(startingPosition);
-            throw new UnexpectedCharacterException("Expected `\"`, got end of file.");
+            throw new UnexpectedCharacterException("Expected `\"`, got end of file.", CreateSpan());
         }
 
         NextCharacter();

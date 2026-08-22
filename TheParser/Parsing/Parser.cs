@@ -3,20 +3,22 @@ using TheParser.Lexing;
 using TheParser.Syntax;
 
 using System.Diagnostics;
-using TheParser.Contracts;
 using TheParser.Parsing.Exceptions;
 
 namespace TheParser.Parsing;
 
-public class Parser(Lexer lexer, ICodeStream codeStream)
+public class Parser(Lexer lexer)
 {
     private Token? _previous = null;
 
+    private int CurrentPosition => lexer.Current != null ? lexer.Current.Position : 0;
     public Token Current => lexer.Current ?? throw new InvalidOperationException("Current token is null.");
 
     public BlockStatement ParseBlockStatement()
     {
-        List<Statement> statements = new();
+        List<Statement> statements = [];
+
+        int start = CurrentPosition;
 
         while (Peek().TokenType != TokenType.EOF)
         {
@@ -28,50 +30,52 @@ public class Parser(Lexer lexer, ICodeStream codeStream)
             statements.Add(st);
         }
 
-        return new BlockStatement(statements);
+        return new BlockStatement(statements, new SourceSpan(start, CurrentPosition - start));
     }
 
     public VariableDeclarationStatement ParseVariableDeclaration()
     {
+        int start = CurrentPosition;
+
         if (!Match(TokenType.Identifier))
-            throw UnexpectedToken(TokenType.Identifier);
+            throw UnexpectedToken(start, TokenType.Identifier);
 
         var identifier = Current;
         Debug.Assert(Current.Value is string);
 
         if (Match(TokenType.Semicolon))
-            return new VariableDeclarationStatement(identifier, null);
+            return new VariableDeclarationStatement(identifier, null, new SourceSpan(start, CurrentPosition - start));
 
-        ConsumeOrFail(TokenType.Equals);
+        ConsumeOrFail(TokenType.Equals, start);
 
         var expr = ParseExpression();
-        ConsumeOrFail(TokenType.Semicolon);
+        ConsumeOrFail(TokenType.Semicolon, start);
 
-        return new VariableDeclarationStatement(identifier, expr);
+        return new VariableDeclarationStatement(identifier, expr, new SourceSpan(start, CurrentPosition - start));
     }
 
     public ExpressionStatement ParseExpressionStatement()
     {
+        int start = CurrentPosition;
         Expr expr = ParseExpression();
 
-        ConsumeOrFail(TokenType.Semicolon);
+        ConsumeOrFail(TokenType.Semicolon, start);
 
-        return new ExpressionStatement(expr);
+        return new ExpressionStatement(expr, new SourceSpan(start, CurrentPosition - start));
     }
 
     public Expr ParseExpression()
     {
+        int start = CurrentPosition;
         Expr expr = ParseTerm();
 
         while (Match(TokenType.Plus, TokenType.Minus))
         {
             Token op = Current;
 
-            Debug.Assert(TokenUtility.IsOperator(op.TokenType), "expr is" + expr.ToString() + op.GetDebugInfo(codeStream));
-
             Expr right = ParseTerm();
 
-            expr = new BinaryExpression(expr, op.TokenType, right);
+            expr = new BinaryExpression(expr, op.TokenType, right, new SourceSpan(start, CurrentPosition - start));
         }
 
         return expr;
@@ -79,6 +83,7 @@ public class Parser(Lexer lexer, ICodeStream codeStream)
 
     public Expr ParseTerm()
     {
+        int start = CurrentPosition;
         Expr expr = ParseUnary();
 
         while (Match(TokenType.Multiply, TokenType.Divide))
@@ -86,7 +91,7 @@ public class Parser(Lexer lexer, ICodeStream codeStream)
             Token op = Current;
             Expr right = ParseUnary();
 
-            expr = new BinaryExpression(expr, op.TokenType, right);
+            expr = new BinaryExpression(expr, op.TokenType, right, new SourceSpan(start, CurrentPosition - start));
         }
 
         return expr;
@@ -94,12 +99,13 @@ public class Parser(Lexer lexer, ICodeStream codeStream)
 
     public Expr ParseUnary()
     {
+        int start = CurrentPosition;
         if (Match(TokenType.Plus, TokenType.Minus))
         {
             var op = Current;
             var operand = ParseUnary();
 
-            return new UnaryExpression(operand, op.TokenType);
+            return new UnaryExpression(operand, op.TokenType, new SourceSpan(start, CurrentPosition - start));
         }
 
         return ParseCall();
@@ -107,17 +113,18 @@ public class Parser(Lexer lexer, ICodeStream codeStream)
 
     private Expr ParseCall()
     {
+        int start = CurrentPosition;
         Expr expr = ParsePrimary();
 
         while (Match(TokenType.OpeningParentheses))
         {
-            expr = FinishCall(expr);
+            expr = FinishCall(expr, start);
         }
 
         return expr;
     }
 
-    private CallExpression FinishCall(Expr callee)
+    private CallExpression FinishCall(Expr callee, int startPosition)
     {
         List<Expr> arguments = new List<Expr>();
 
@@ -130,26 +137,27 @@ public class Parser(Lexer lexer, ICodeStream codeStream)
             } while (Match(TokenType.Comma));
         }
 
-        ConsumeOrFail(TokenType.ClosingParentheses);
+        ConsumeOrFail(TokenType.ClosingParentheses, startPosition);
 
-        return new CallExpression(callee, arguments);
+        return new CallExpression(callee, arguments, new SourceSpan(startPosition, CurrentPosition - startPosition));
     }
 
     public Expr ParsePrimary()
     {
+        int start = CurrentPosition;
         if (Match(TokenType.Number))
         {
-            return new NumberExpression((double)Current.Value!);
+            return new NumberExpression((double)Current.Value!, new SourceSpan(start, CurrentPosition - start));
         }
 
         if (Match(TokenType.String))
         {
-            return new StringExpression((string)Current.Value!);
+            return new StringExpression((string)Current.Value!, new SourceSpan(start, CurrentPosition - start));
         }
 
         if (Match(TokenType.Identifier))
         {
-            return new IdentifierExpression((string)Current.Value!);
+            return new IdentifierExpression((string)Current.Value!, new SourceSpan(start, CurrentPosition - start));
         }
 
         if (Match(TokenType.OpeningParentheses))
@@ -159,14 +167,15 @@ public class Parser(Lexer lexer, ICodeStream codeStream)
             return expr;
         }
 
-        throw UnexpectedToken();
+        throw UnexpectedToken(start);
     }
 
 
-    private UnexpectedTokenException UnexpectedToken(params TokenType[] expected)
+    private UnexpectedTokenException UnexpectedToken(int start, params TokenType[] expected)
     {
         return new UnexpectedTokenException(
             Current.TokenType,
+            new SourceSpan(start, CurrentPosition - start),
             expected
         );
     }
@@ -202,9 +211,9 @@ public class Parser(Lexer lexer, ICodeStream codeStream)
         return false;
     }
 
-    private void ConsumeOrFail(TokenType tokenType)
+    private void ConsumeOrFail(TokenType tokenType, int start)
     {
         if (!Match(tokenType))
-            throw UnexpectedToken(tokenType);
+            throw UnexpectedToken(start, tokenType);
     }
 }
