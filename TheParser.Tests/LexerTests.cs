@@ -8,7 +8,7 @@ public class LexerTests
 {
     private static Lexer CreateLexer(string text)
     {
-        return new Lexer(new CliCodeStream(text));
+        return new Lexer(text);
     }
 
     [Theory]
@@ -73,26 +73,25 @@ public class LexerTests
     [InlineData("$", 0, 0)]
     public void NextToken_UnexpectedCharacter_ThrowsUnexpectedCharacterException(string input, int position, int tokenNumber)
     {
-        var cliCodeStream = new CliCodeStream(input);
-        var lexer = new Lexer(cliCodeStream);
+        var lexer = new Lexer(input);
         for (int i = 0; i < tokenNumber; i++)
             lexer.NextToken();
 
         Assert.Throws<UnexpectedCharacterException>(lexer.NextToken);
-        Assert.Equal(position, cliCodeStream.Position);
+        Assert.Equal(position, lexer.Position);
     }
 
     [Fact]
     public void Peek_DoesNotAdvanceLexer()
     {
-        var stream = new CliCodeStream("123   + 5");
-        var lexer = new Lexer(stream);
+        const string content = "123   + 5";
+        var lexer = new Lexer(content);
 
-        int oldPosition = stream.Position;
+        int oldPosition = lexer.Position;
 
         var peeked = lexer.Peek();
 
-        int positionAfter = stream.Position;
+        int positionAfter = lexer.Position;
 
         Assert.Equal(oldPosition, positionAfter);
 

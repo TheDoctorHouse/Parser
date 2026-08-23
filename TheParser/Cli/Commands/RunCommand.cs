@@ -4,7 +4,6 @@ using TheParser.Runtime;
 using TheParser.Syntax;
 using TheParser.Debugging;
 using TheParser.Cli.Attributes;
-using TheParser.Contracts;
 using TheParser.Debugging.Exceptions;
 
 namespace TheParser.Cli.Commands;
@@ -30,8 +29,7 @@ public sealed class RunCommand : CliCommand
 
         string content = File.ReadAllText(filePath);
 
-        ICodeStream cliCodeStream = new CliCodeStream(content);
-        Lexer lexer = new(cliCodeStream);
+        Lexer lexer = new(content);
 
         if (debug)
         {
@@ -42,7 +40,7 @@ public sealed class RunCommand : CliCommand
             }
             catch (LanguageException ex)
             {
-                return CliCommandResult.Fail(ex, BuildFailMessage(ex, cliCodeStream));
+                return CliCommandResult.Fail(ex, BuildFailMessage(ex, content));
             }
             Console.WriteLine("Lexer:");
             while (token.TokenType != TokenType.EOF)
@@ -57,7 +55,7 @@ public sealed class RunCommand : CliCommand
                 }
                 catch (LanguageException ex)
                 {
-                    return CliCommandResult.Fail(ex, BuildFailMessage(ex, cliCodeStream));
+                    return CliCommandResult.Fail(ex, BuildFailMessage(ex, content));
                 }
             }
 
@@ -76,7 +74,7 @@ public sealed class RunCommand : CliCommand
         }
         catch (LanguageException ex)
         {
-            return CliCommandResult.Fail(ex, BuildFailMessage(ex, cliCodeStream));
+            return CliCommandResult.Fail(ex, BuildFailMessage(ex, content));
         }
 
         if (debug)
@@ -98,17 +96,45 @@ public sealed class RunCommand : CliCommand
         }
         catch (LanguageException ex)
         {
-            return CliCommandResult.Fail(ex, BuildFailMessage(ex, cliCodeStream));
+            return CliCommandResult.Fail(ex, BuildFailMessage(ex, content));
         }
 
         return CliCommandResult.Success();
     }
 
-    private static string BuildFailMessage(LanguageException ex, ICodeStream codeStream)
+    private static string BuildFailMessage(LanguageException ex, string content)
     {
-        string message = DebugUtility.PingPosition(codeStream, ex.Span);
+        string message = DebugUtility.PingPosition(content, ex.Span);
         var pos = ex.Span.Start;
-        message += $"\nLine {codeStream.GetLineNumber(pos) + 1}, position {pos - codeStream.GetLineStart(pos) + 1}.";
+        int line = GetLineNumber(content, pos);
+        int linePos = pos - GetLineStart(content, pos);
+        message += $"\nLine {line + 1}, position {linePos + 1}.";
         return message;
+    }
+
+    private static int GetLineNumber(string content, int position)
+    {
+        int lineNumber = 0;
+        int currentPosition = 0;
+
+        while (currentPosition != position)
+        {
+            if (content[currentPosition] == '\n')
+                lineNumber++;
+            currentPosition++;
+        }
+
+        return lineNumber;
+    }
+
+    public static int GetLineStart(string content, int position)
+    {
+        if (content[position] == '\n')
+            position--;
+
+        if (position == 0)
+            return position;
+        var start = content.LastIndexOf('\n', position);
+        return start == -1 ? 0 : start + 1;
     }
 }
