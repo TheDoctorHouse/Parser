@@ -10,16 +10,14 @@ public class ParserTests
 {
     public Expr ParseExpression(string content)
     {
-        var codeStream = new CliCodeStream(content);
-        var lexer = new Lexer(codeStream);
+        var lexer = new Lexer(content);
         var astBuilder = new Parser(lexer);
         return astBuilder.ParseExpression();
     }
 
     public Statement ParseStatement(string content)
     {
-        var codeStream = new CliCodeStream(content);
-        var lexer = new Lexer(codeStream);
+        var lexer = new Lexer(content);
         var astBuilder = new Parser(lexer);
         return astBuilder.ParseBlockStatement();
     }

@@ -1,7 +1,4 @@
-using System.Diagnostics;
 using System.Reflection;
-using TheParser.Cli;
-using TheParser.Contracts;
 using TheParser.Lexing;
 using TheParser.Parsing;
 using TheParser.Runtime;
@@ -83,8 +80,7 @@ public class RuntimeTests
 
     private static Statement ParseStatement(string input)
     {
-        ICodeStream codeStream = new CliCodeStream(input);
-        Lexer lexer = new(codeStream);
+        Lexer lexer = new(input);
         Parser parser = new(lexer);
 
         return parser.ParseBlockStatement();

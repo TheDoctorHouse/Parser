@@ -1,5 +1,4 @@
 using System.Text;
-using TheParser.Contracts;
 using TheParser.Debugging;
 
 namespace TheParser.Lexing;

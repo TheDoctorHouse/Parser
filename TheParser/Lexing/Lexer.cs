@@ -1,5 +1,4 @@
 using System.Text;
-using TheParser.Contracts;
 using TheParser.Lexing.Exceptions;
 using TheParser.Syntax;
 
@@ -9,11 +8,12 @@ public class Lexer
 {
     public Token? Current { get; private set; }
 
-    public ICodeStream _codeStream;
+    private string _content;
+    public int Position { get; private set; }
 
-    public Lexer(ICodeStream codeStream)
+    public Lexer(string input)
     {
-        _codeStream = codeStream;
+        _content = input;
     }
 
     public Token NextToken()
@@ -25,23 +25,23 @@ public class Lexer
 
     public Token Peek()
     {
-        var position = _codeStream.Position;
+        var position = Position;
         var token = NextTokenInternal();
-        _codeStream.Seek(position);
+        Position = position;
         return token;
     }
 
     public void Reset()
     {
-        _codeStream.Seek(0);
+        Position = 0;
     }
 
     private Token NextTokenInternal()
     {
-        if (_codeStream.Current == null)
+        if (Position >= _content.Length)
             return CreateToken(TokenType.EOF);
 
-        var currentChar = _codeStream.Current.Value;
+        var currentChar = _content[Position];
 
         switch (currentChar)
         {
@@ -111,14 +111,14 @@ public class Lexer
 
     public SourceSpan CreateSpan()
     {
-        return new SourceSpan(_codeStream.Position, 1);
+        return new SourceSpan(Position, 1);
     }
 
     private static bool IsLetter(char c) => c is >= 'a' and <= 'z' or >= 'A' and <= 'Z';
 
     private string ParseString()
     {
-        int startingPosition = _codeStream.Position;
+        int startingPosition = Position;
         char? currentChar = NextCharacter();
         StringBuilder sb = new();
 
@@ -140,7 +140,7 @@ public class Lexer
 
         if (!currentChar.HasValue)
         {
-            _codeStream.Seek(startingPosition);
+            Position = startingPosition;
             throw new UnexpectedCharacterException("Expected `\"`, got end of file.", CreateSpan());
         }
 
@@ -151,15 +151,16 @@ public class Lexer
 
     private bool TryPeek(out char c)
     {
-        char? result = _codeStream.Peek();
+        var peekPosition = Position + 1;
+        var success = peekPosition < _content.Length;
+        if (success)
+        {
+            c = _content[peekPosition];
+            return true;
+        }
 
         c = default;
-
-        if (result is null)
-            return false;
-
-        c = result.Value;
-        return true;
+        return false;
     }
 
     private string ParseIdentifier(char? currentChar)
@@ -175,11 +176,14 @@ public class Lexer
     }
 
     private Token CreateToken(TokenType type, object? value = null) =>
-        new Token(type, value, _codeStream.Position);
+        new Token(type, value, Position);
 
     private char? NextCharacter()
     {
-        return _codeStream.Next();
+        Position += 1;
+        if (Position >= _content.Length)
+            return null;
+        return _content[Position];
     }
 
     private double ParseNumber(char? currentChar)
