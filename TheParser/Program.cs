@@ -23,8 +23,6 @@ if (commandType == null)
     return 3;
 }
 
-// Assuming every command has zero arguments.
-// todo: unit test validating that command has 0 arguments.
 var command = (CliCommand)Activator.CreateInstance(commandType.Type)!;
 
 try
