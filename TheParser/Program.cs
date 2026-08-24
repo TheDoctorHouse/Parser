@@ -23,18 +23,11 @@ if (commandType == null)
     return 3;
 }
 
-var command = (CliCommand)Activator.CreateInstance(commandType.Type)!;
+var runner = new CommandRunner(commandType);
 
 try
 {
-    var argumentsProvider = new ArgumentsProvider(args);
-
-    CliCommandResult? result = argumentsProvider.Validate(commandType);
-
-    if (result != null)
-        return result.Value.AcknowledgeUser();
-
-    return command.Run(argumentsProvider).AcknowledgeUser();
+    return runner.Run(args);
 }
 catch (Exception ex)
 {
