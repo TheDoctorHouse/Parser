@@ -23,7 +23,7 @@ public class DependencyInjector
 
         throw new InvalidOperationException($"Cannot resolve type `{t.FullName}`");
     }
-    
+
     public object CreateInstance(Type t)
     {
         var constructors = t.GetConstructors();

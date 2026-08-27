@@ -49,7 +49,7 @@ public class CommandTests
         var injector = new DependencyInjector();
         var testPrinter = new TestPrinter();
         injector.AddSingleton<IPrinter>(testPrinter);
-    
+
         const string inputText = "Foo";
         var testReader = new TestReader(inputText);
         injector.AddSingleton<IReader>(testReader);
