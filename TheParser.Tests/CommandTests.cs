@@ -1,7 +1,7 @@
-using System.Diagnostics;
 using TheParser.Cli;
 using TheParser.Cli.Commands;
 using TheParser.Debugging.Exceptions;
+using TheParser.DependencyInjection;
 using TheParser.Runtime.IO;
 
 namespace TheParser.Tests;

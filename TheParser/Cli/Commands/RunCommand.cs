@@ -5,6 +5,7 @@ using TheParser.Syntax;
 using TheParser.Debugging;
 using TheParser.Cli.Attributes;
 using TheParser.Debugging.Exceptions;
+using TheParser.DependencyInjection;
 
 namespace TheParser.Cli.Commands;
 

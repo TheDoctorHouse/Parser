@@ -1,5 +1,5 @@
 using System.Reflection;
-using TheParser.Cli;
+using TheParser.DependencyInjection;
 using TheParser.Runtime.Functions.Attributes;
 
 namespace TheParser.Runtime.Functions;

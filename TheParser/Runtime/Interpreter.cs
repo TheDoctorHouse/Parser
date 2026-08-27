@@ -3,7 +3,7 @@ using TheParser.Syntax;
 using TheParser.Lexing;
 using TheParser.Runtime.Functions;
 using TheParser.Runtime.Exceptions;
-using TheParser.Cli;
+using TheParser.DependencyInjection;
 
 namespace TheParser.Runtime;
 

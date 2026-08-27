@@ -1,4 +1,5 @@
 using TheParser.Cli.Commands;
+using TheParser.DependencyInjection;
 
 namespace TheParser.Cli;
 

@@ -1,4 +1,4 @@
-namespace TheParser.Cli;
+namespace TheParser.DependencyInjection;
 
 public class DependencyInjector
 {

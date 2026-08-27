@@ -1,6 +1,7 @@
 ﻿using TheParser.Cli;
 using TheParser.Cli.Commands;
 using TheParser.Cli.IO;
+using TheParser.DependencyInjection;
 using TheParser.Runtime.IO;
 
 if (args.Length == 0)
