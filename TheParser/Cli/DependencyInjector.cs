@@ -13,7 +13,7 @@ public class DependencyInjector
     public void AddSingleton<T>(T dep) where T : notnull
     {
         if (!_dependencies.TryAdd(typeof(T), dep))
-            throw new InvalidOperationException("Cannot add the same signleton type twice.");
+            throw new InvalidOperationException("Cannot add the same singleton type twice.");
     }
 
     private object ResolveOrThrow(Type t)
