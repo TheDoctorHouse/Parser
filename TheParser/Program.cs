@@ -1,7 +1,8 @@
 ﻿using TheParser.Cli;
 using TheParser.Cli.Commands;
-using TheParser.Debugging;
-using TheParser.Debugging.Exceptions;
+using TheParser.Cli.IO;
+using TheParser.DependencyInjection;
+using TheParser.Runtime.IO;
 
 if (args.Length == 0)
 {
@@ -23,7 +24,11 @@ if (commandType == null)
     return 3;
 }
 
-var runner = new CommandRunner(commandType);
+var injector = new DependencyInjector();
+injector.AddSingleton<IReader>(new ConsoleReader());
+injector.AddSingleton<IPrinter>(new ConsolePrinter());
+
+var runner = new CommandRunner(commandType, injector);
 
 try
 {

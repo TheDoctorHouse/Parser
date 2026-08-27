@@ -5,6 +5,7 @@ using TheParser.Syntax;
 using TheParser.Debugging;
 using TheParser.Cli.Attributes;
 using TheParser.Debugging.Exceptions;
+using TheParser.DependencyInjection;
 
 namespace TheParser.Cli.Commands;
 
@@ -12,7 +13,7 @@ namespace TheParser.Cli.Commands;
 [CommandResource(Resource.RunDescription)]
 [RequirePositionals("path")]
 [SupportedFlags("--debug")]
-public sealed class RunCommand : CliCommand
+public sealed class RunCommand(DependencyInjector injector) : CliCommand
 {
     public override Resource CommandDescription => Resource.RunDescription;
 
@@ -88,7 +89,7 @@ public sealed class RunCommand : CliCommand
             Console.WriteLine("Interpreter: ");
         }
 
-        Interpreter interpreter = new();
+        Interpreter interpreter = new(injector);
 
         try
         {

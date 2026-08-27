@@ -3,6 +3,7 @@ using TheParser.Syntax;
 using TheParser.Lexing;
 using TheParser.Runtime.Functions;
 using TheParser.Runtime.Exceptions;
+using TheParser.DependencyInjection;
 
 namespace TheParser.Runtime;
 
@@ -11,9 +12,9 @@ public class Interpreter
     private Dictionary<string, Interpretation> _variables = new();
     private Dictionary<string, IFunction> _functions;
 
-    public Interpreter()
+    public Interpreter(DependencyInjector injector)
     {
-        _functions = BuiltInFunctionScanner.ScanAndCreateBuiltInFunctions();
+        _functions = BuiltInFunctionScanner.ScanAndCreateBuiltInFunctions(injector);
     }
 
     public void InterpretStatement(Statement statement)

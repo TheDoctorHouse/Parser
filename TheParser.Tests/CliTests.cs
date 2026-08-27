@@ -18,13 +18,12 @@ public class CliTests
     }
 
     [Fact]
-    public void CliCommandTypes_HasExactlyOneParamaterlessConstructor()
+    public void CliCommandTypes_HasExactlyOneConstructor()
     {
         foreach (var commandType in GetCommandTypes())
         {
             var constructors = commandType.GetConstructors();
             Assert.Single(constructors);
-            Assert.Empty(constructors[0].GetParameters());
         }
     }
 
