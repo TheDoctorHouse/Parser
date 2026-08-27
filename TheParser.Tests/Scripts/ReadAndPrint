@@ -1,0 +1,3 @@
+@readed = Ask();
+Print(readed);
+Print("The `" + readed + "` bar is my favorite.");

@@ -1,11 +1,12 @@
 using System.Reflection;
+using TheParser.Cli;
 using TheParser.Runtime.Functions.Attributes;
 
 namespace TheParser.Runtime.Functions;
 
 public static class BuiltInFunctionScanner
 {
-    public static Dictionary<string, IFunction> ScanAndCreateBuiltInFunctions()
+    public static Dictionary<string, IFunction> ScanAndCreateBuiltInFunctions(DependencyInjector injector)
     {
         var functionTypes = Assembly.GetExecutingAssembly().GetTypes()
             .Where(t => !t.IsAbstract && typeof(BuiltInFunction).IsAssignableFrom(t));
@@ -32,7 +33,7 @@ public static class BuiltInFunctionScanner
                         );
             }
 
-            var builtIn = (BuiltInFunction)Activator.CreateInstance(funcType)!;
+            var builtIn = (BuiltInFunction)injector.CreateInstance(funcType)!;
             var adapter = new BuiltInFunctionAdapter(attribute.Name, attribute.Arguments, builtIn);
 
             functions.Add(attribute.Name, adapter);

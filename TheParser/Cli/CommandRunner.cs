@@ -2,11 +2,11 @@ using TheParser.Cli.Commands;
 
 namespace TheParser.Cli;
 
-public class CommandRunner(CommandType commandType)
+public class CommandRunner(CommandType commandType, DependencyInjector injector)
 {
     public int Run(string[] args)
     {
-        var command = (CliCommand)Activator.CreateInstance(commandType.Type)!;
+        var command = (CliCommand)injector.CreateInstance(commandType.Type)!;
 
         var argumentsProvider = new ArgumentsProvider(args);
 

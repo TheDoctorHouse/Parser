@@ -51,7 +51,7 @@ public class RuntimeTests
     public void InterpretStatement_MissingVariable_ThrowsUnresolvedVariableException(string input)
     {
         Statement st = ParseStatement(input);
-        Interpreter interpreter = new();
+        Interpreter interpreter = new(TestUtility.CreateConsoleDependencyInjector());
         Assert.Throws<UnresolvedVariableException>(() =>
             interpreter.InterpretStatement(st));
     }
@@ -62,7 +62,7 @@ public class RuntimeTests
     public void InterpretStatement_NonExistingFunctionCall_ThrowsUnresolvedFunctionException(string input)
     {
         Statement st = ParseStatement(input);
-        Interpreter interpreter = new();
+        Interpreter interpreter = new(TestUtility.CreateConsoleDependencyInjector());
         Assert.Throws<UnresolvedFunctionException>(() =>
             interpreter.InterpretStatement(st));
     }
@@ -73,7 +73,7 @@ public class RuntimeTests
     public void InterpretStatement_IncorrectArguments_ThrowsInvalidArgumentsException(string input)
     {
         Statement st = ParseStatement(input);
-        Interpreter interpreter = new();
+        Interpreter interpreter = new(TestUtility.CreateConsoleDependencyInjector());
         Assert.Throws<InvalidArgumentsException>(() =>
             interpreter.InterpretStatement(st));
     }
@@ -85,4 +85,5 @@ public class RuntimeTests
 
         return parser.ParseBlockStatement();
     }
+
 }
