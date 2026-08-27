@@ -26,8 +26,13 @@ public class DependencyInjector
     
     public object CreateInstance(Type t)
     {
-        var constructor = t.GetConstructors()[0];
-        var parameters = constructor.GetParameters();
+        var constructors = t.GetConstructors();
+        if (constructors.Length != 1)
+        {
+            throw new InvalidOperationException(
+                $"Type `{t.FullName}` must have exactly one public constructor.");
+        }
+        var parameters = constructors[0].GetParameters();
         var args = new object[parameters.Length];
 
         for (int i = 0; i < parameters.Length; i++)
