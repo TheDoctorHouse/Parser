@@ -120,7 +120,7 @@ public class Lexer
 
     private bool TryConsumeKeyword(string word)
     {
-        int initialPos = Position; 
+        int initialPos = Position;
 
         foreach (char c in word)
         {

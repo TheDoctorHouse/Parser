@@ -106,7 +106,7 @@ public class CommandTests
         var commandType = CommandHelper.GetCommandType(commandName);
         Assert.NotNull(commandType);
         Assert.Null(argProvider.Validate(commandType));
-        
+
         var writer = new StringWriter();
         Console.SetOut(writer);
 
