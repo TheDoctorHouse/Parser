@@ -145,6 +145,7 @@ public class Parser(Lexer lexer)
     public Expr ParsePrimary()
     {
         int start = CurrentPosition;
+
         if (Match(TokenType.Number))
         {
             return new NumberExpression((double)Current.Value!, new SourceSpan(start, CurrentPosition - start));
@@ -153,6 +154,11 @@ public class Parser(Lexer lexer)
         if (Match(TokenType.String))
         {
             return new StringExpression((string)Current.Value!, new SourceSpan(start, CurrentPosition - start));
+        }
+
+        if (Match(TokenType.Boolean))
+        {
+            return new BooleanExpression((bool)Current.Value!, new SourceSpan(start, CurrentPosition - start));
         }
 
         if (Match(TokenType.Identifier))

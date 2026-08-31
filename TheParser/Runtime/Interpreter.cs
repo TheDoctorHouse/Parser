@@ -48,6 +48,8 @@ public class Interpreter
                 return new StringInterpretation(se.Value);
             case NumberExpression ne:
                 return new NumberInterpretation(ne.Value);
+            case BooleanExpression bne:
+                return new BooleanInterpretation(bne.Value);
             case BinaryExpression be:
                 return SolveBinaryOperation(InterpretExpression(be.Left), be.Operator, InterpretExpression(be.Right), be.Span);
             case UnaryExpression ue:

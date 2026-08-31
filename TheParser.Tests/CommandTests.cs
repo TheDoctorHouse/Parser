@@ -43,6 +43,32 @@ public class CommandTests
 
     }
 
+    [Theory]
+    [InlineData("Boolean", "True")]
+    public void RunCommand_CorrectInput_OutputsCorrectContent(string scriptName, string expectedOutput)
+    {
+        var path = Path.Combine(AppContext.BaseDirectory, "Scripts", scriptName);
+        Assert.True(File.Exists(path), $"Script {path} was not found.");
+
+        var injector = new DependencyInjector();
+        var printer = new TestPrinter();
+        injector.AddSingleton<IReader>(new TestReader());
+        injector.AddSingleton<IPrinter>(printer);
+
+        var command = new RunCommand(injector);
+
+        var argumentsProvider = new ArgumentsProvider(["run", path]);
+        var commandType = CommandHelper.GetCommandType("run");
+        Assert.NotNull(commandType);
+        Assert.Null(argumentsProvider.Validate(commandType));
+        CliCommandResult res = command.Run(argumentsProvider);
+        Assert.Equal(CliCommandResult.SUCCESS, res.ResultCode);
+
+        Assert.True(printer.TryDequeue(out string? str));
+        Assert.Equal(expectedOutput, str);
+        Assert.False(printer.TryDequeue(out _));
+    }
+
     [Fact]
     public void RunCommand_TestPrinterAndReaderWorks()
     {
