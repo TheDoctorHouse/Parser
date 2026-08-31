@@ -1,0 +1,10 @@
+Output tokens of the provided code.
+
+Usage:
+  {0}
+
+Arguments:
+  <code>      A string that will be lexed.
+
+Example:
+  parser lex-code "bool value = Foo();"
