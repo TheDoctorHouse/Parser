@@ -39,7 +39,7 @@ public sealed class RunCommand(DependencyInjector injector) : CliCommand
             }
             catch (LanguageException ex)
             {
-                return CliCommandResult.Fail(ex, BuildFailMessage(ex, content));
+                return CliCommandResult.Fail(ex, DebugUtility.BuildFailMessage(ex, content));
             }
             Console.WriteLine("Lexer:");
             while (token.TokenType != TokenType.EOF)
@@ -54,7 +54,7 @@ public sealed class RunCommand(DependencyInjector injector) : CliCommand
                 }
                 catch (LanguageException ex)
                 {
-                    return CliCommandResult.Fail(ex, BuildFailMessage(ex, content));
+                    return CliCommandResult.Fail(ex, DebugUtility.BuildFailMessage(ex, content));
                 }
             }
 
@@ -73,7 +73,7 @@ public sealed class RunCommand(DependencyInjector injector) : CliCommand
         }
         catch (LanguageException ex)
         {
-            return CliCommandResult.Fail(ex, BuildFailMessage(ex, content));
+            return CliCommandResult.Fail(ex, DebugUtility.BuildFailMessage(ex, content));
         }
 
         if (debug)
@@ -95,45 +95,10 @@ public sealed class RunCommand(DependencyInjector injector) : CliCommand
         }
         catch (LanguageException ex)
         {
-            return CliCommandResult.Fail(ex, BuildFailMessage(ex, content));
+            return CliCommandResult.Fail(ex, DebugUtility.BuildFailMessage(ex, content));
         }
 
         return CliCommandResult.Success();
     }
 
-    private static string BuildFailMessage(LanguageException ex, string content)
-    {
-        string message = DebugUtility.PingPosition(content, ex.Span);
-        var pos = ex.Span.Start;
-        int line = GetLineNumber(content, pos);
-        int linePos = pos - GetLineStart(content, pos);
-        message += $"\nLine {line + 1}, position {linePos + 1}.";
-        return message;
-    }
-
-    private static int GetLineNumber(string content, int position)
-    {
-        int lineNumber = 0;
-        int currentPosition = 0;
-
-        while (currentPosition != position)
-        {
-            if (content[currentPosition] == '\n')
-                lineNumber++;
-            currentPosition++;
-        }
-
-        return lineNumber;
-    }
-
-    public static int GetLineStart(string content, int position)
-    {
-        if (content[position] == '\n')
-            position--;
-
-        if (position == 0)
-            return position;
-        var start = content.LastIndexOf('\n', position);
-        return start == -1 ? 0 : start + 1;
-    }
 }
