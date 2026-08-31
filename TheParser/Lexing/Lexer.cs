@@ -11,6 +11,9 @@ public class Lexer
     private string _content;
     public int Position { get; private set; }
 
+    private const string TrueKeyword = "true";
+    private const string FalseKeyword = "false";
+
     public Lexer(string input)
     {
         _content = input;
@@ -85,13 +88,19 @@ public class Lexer
             return NextToken();
         }
 
+        if (TryConsumeKeyword(TrueKeyword))
+            return CreateToken(TokenType.Boolean, value: true);
+
+        if (TryConsumeKeyword(FalseKeyword))
+            return CreateToken(TokenType.Boolean, value: false);
+
         if (char.IsDigit(currentChar))
         {
             double value = ParseNumber(currentChar);
             return CreateToken(TokenType.Number, value);
         }
 
-        if (IsLetter(currentChar))
+        if (IsIdentifierCharacter(currentChar))
         {
             string value = ParseIdentifier(currentChar);
             return CreateToken(TokenType.Identifier, value);
@@ -109,12 +118,36 @@ public class Lexer
             );
     }
 
+    private bool TryConsumeKeyword(string word)
+    {
+        int initialPos = Position; 
+
+        foreach (char c in word)
+        {
+            if (Position >= _content.Length || c != _content[Position])
+            {
+                Position = initialPos;
+                return false;
+            }
+
+            Position++;
+        }
+
+        if (Position < _content.Length && IsIdentifierCharacter(_content[Position]))
+        {
+            Position = initialPos;
+            return false;
+        }
+
+        return true;
+    }
+
     public SourceSpan CreateSpan()
     {
         return new SourceSpan(Position, 1);
     }
 
-    private static bool IsLetter(char c) => c is >= 'a' and <= 'z' or >= 'A' and <= 'Z';
+    private static bool IsIdentifierCharacter(char c) => c is >= 'a' and <= 'z' or >= 'A' and <= 'Z';
 
     private string ParseString()
     {
@@ -166,7 +199,7 @@ public class Lexer
     private string ParseIdentifier(char? currentChar)
     {
         StringBuilder sb = new StringBuilder();
-        while (currentChar != null && IsLetter(currentChar.Value))
+        while (currentChar != null && IsIdentifierCharacter(currentChar.Value))
         {
             sb.Append(currentChar.Value);
             currentChar = NextCharacter();

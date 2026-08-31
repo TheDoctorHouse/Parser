@@ -8,6 +8,7 @@ public enum TokenType
     Divide,
     Number,
     String,
+    Boolean,
     Equals,
     Comma,
     Semicolon,
