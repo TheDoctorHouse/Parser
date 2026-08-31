@@ -15,8 +15,6 @@ namespace TheParser.Cli.Commands;
 [SupportedFlags("--debug")]
 public sealed class RunCommand(DependencyInjector injector) : CliCommand
 {
-    public override Resource CommandDescription => Resource.RunDescription;
-
     public override CliCommandResult Run(ArgumentsProvider provider)
     {
         string filePath = provider.ReadPositioned(0);
