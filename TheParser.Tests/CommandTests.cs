@@ -1,4 +1,7 @@
+using System.Diagnostics;
+using System.Reflection;
 using TheParser.Cli;
+using TheParser.Cli.Attributes;
 using TheParser.Cli.Commands;
 using TheParser.Debugging.Exceptions;
 using TheParser.DependencyInjection;
@@ -63,5 +66,48 @@ public class CommandTests
         Assert.True(testPrinter.TryDequeue(out content));
         Assert.Equal($"The `{inputText}` bar is my favorite.", content);
         Assert.False(testPrinter.TryDequeue(out _));
+    }
+
+    [Theory]
+    [InlineData("false", "Boolean(False)")]
+    [InlineData("true", "Boolean(True)")]
+    [InlineData("foo", "Identifier(foo)")]
+    public void LexCode_CorrectUsage_ProvidesCorrectOutput(string code, string expected)
+    {
+        const string commandName = "lex-code";
+        var command = new LexCodeCommand();
+        var argProvider = new ArgumentsProvider([commandName, code]);
+        var commandType = CommandHelper.GetCommandType(commandName);
+        Assert.NotNull(commandType);
+        Assert.Null(argProvider.Validate(commandType));
+        
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+
+        command.Run(argProvider);
+        Assert.Equal(expected, writer.ToString().Trim());
+    }
+
+    [Fact]
+    public void HelpCommand_DoesNotThrowWithCorrectCommand()
+    {
+        Console.SetOut(new StringWriter());
+        const string helpCommandName = "help";
+        var types = TestUtility.GetCliCommandTypes();
+
+        foreach (var t in types)
+        {
+            var attr = t.GetCustomAttribute<CommandNameAttribute>();
+            Assert.True(attr is not null, $"No command name attribute on command {t.FullName}");
+            var name = attr.CommandName;
+            var command = new HelpCommand();
+
+            var argumentsProvider = new ArgumentsProvider(["help", name]);
+            var commandType = CommandHelper.GetCommandType(helpCommandName);
+            Assert.NotNull(commandType);
+            Assert.Null(argumentsProvider.Validate(commandType));
+            var exception = Record.Exception(() => command.Run(argumentsProvider));
+            Assert.Null(exception);
+        }
     }
 }
