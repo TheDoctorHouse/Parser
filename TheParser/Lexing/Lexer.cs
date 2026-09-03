@@ -48,7 +48,7 @@ public class Lexer
 
         if (TryConsumeSymbolToken(currentChar, out Token? token))
             return token!;
-        
+
         if (char.IsWhiteSpace(currentChar))
         {
             NextCharacter();
@@ -127,8 +127,45 @@ public class Lexer
                 break;
             case '=':
                 NextCharacter();
+
+                if (TryConsume("="))
+                {
+                    token = CreateToken(TokenType.EqualsEquals);
+                    break;
+                }
+
                 token = CreateToken(TokenType.Equals);
                 break;
+            case '<':
+                NextCharacter();
+
+                if (TryConsume("="))
+                {
+                    token = CreateToken(TokenType.LessEqual);
+                    break;
+                }
+
+                token = CreateToken(TokenType.Less);
+                break;
+            case '>':
+                NextCharacter();
+
+                if (TryConsume("="))
+                {
+                    token = CreateToken(TokenType.GreaterEqual);
+                    break;
+                }
+
+                token = CreateToken(TokenType.Greater);
+                break;
+            case '!':
+                if (TryConsume("="))
+                {
+                    token = CreateToken(TokenType.NotEqual);
+                    break;
+                }
+
+                goto default;
             default:
                 token = default;
                 return false;
