@@ -147,7 +147,7 @@ public class Lexer
         return new SourceSpan(Position, 1);
     }
 
-    private static bool IsIdentifierCharacter(char c) => c is >= 'a' and <= 'z' or >= 'A' and <= 'Z';
+    private static bool IsIdentifierCharacter(char c) => c is >= 'a' and <= 'z' or >= 'A' and <= 'Z' or >= '0' and <= '9';
 
     private string ParseString()
     {
