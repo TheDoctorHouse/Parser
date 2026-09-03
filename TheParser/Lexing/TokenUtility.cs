@@ -24,6 +24,8 @@ public static class TokenUtility
             TokenType.EqualsEquals or
             TokenType.LessEqual or
             TokenType.GreaterEqual or
-            TokenType.NotEqual;
+            TokenType.NotEqual or
+            TokenType.Greater or
+            TokenType.Less;
     }
 }
