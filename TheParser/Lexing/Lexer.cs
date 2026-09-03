@@ -46,42 +46,9 @@ public class Lexer
 
         var currentChar = _content[Position];
 
-        switch (currentChar)
-        {
-            case '+':
-                NextCharacter();
-                return CreateToken(TokenType.Plus);
-            case '-':
-                NextCharacter();
-                return CreateToken(TokenType.Minus);
-            case '*':
-                NextCharacter();
-                return CreateToken(TokenType.Multiply);
-            case '/':
-                NextCharacter();
-                return CreateToken(TokenType.Divide);
-            case '(':
-                NextCharacter();
-                return CreateToken(TokenType.OpeningParentheses);
-            case ')':
-                NextCharacter();
-                return CreateToken(TokenType.ClosingParentheses);
-            case ';':
-                NextCharacter();
-                return CreateToken(TokenType.Semicolon);
-            case ',':
-                NextCharacter();
-                return CreateToken(TokenType.Comma);
-            case '@':
-                NextCharacter();
-                return CreateToken(TokenType.Declaration);
-            case '=':
-                NextCharacter();
-                return CreateToken(TokenType.Equals);
-            default:
-                break;
-        }
-
+        if (TryConsumeSymbolToken(currentChar, out Token? token))
+            return token!;
+        
         if (char.IsWhiteSpace(currentChar))
         {
             NextCharacter();
@@ -116,6 +83,58 @@ public class Lexer
             $"Cannot resolve character '{currentChar}'.",
             CreateSpan()
             );
+    }
+
+    private bool TryConsumeSymbolToken(in char currentChar, out Token? token)
+    {
+        switch (currentChar)
+        {
+            case '+':
+                NextCharacter();
+                token = CreateToken(TokenType.Plus);
+                break;
+            case '-':
+                NextCharacter();
+                token = CreateToken(TokenType.Minus);
+                break;
+            case '*':
+                NextCharacter();
+                token = CreateToken(TokenType.Multiply);
+                break;
+            case '/':
+                NextCharacter();
+                token = CreateToken(TokenType.Divide);
+                break;
+            case '(':
+                NextCharacter();
+                token = CreateToken(TokenType.OpeningParentheses);
+                break;
+            case ')':
+                NextCharacter();
+                token = CreateToken(TokenType.ClosingParentheses);
+                break;
+            case ';':
+                NextCharacter();
+                token = CreateToken(TokenType.Semicolon);
+                break;
+            case ',':
+                NextCharacter();
+                token = CreateToken(TokenType.Comma);
+                break;
+            case '@':
+                NextCharacter();
+                token = CreateToken(TokenType.Declaration);
+                break;
+            case '=':
+                NextCharacter();
+                token = CreateToken(TokenType.Equals);
+                break;
+            default:
+                token = default;
+                return false;
+        }
+
+        return true;
     }
 
     private bool TryConsumeKeyword(string word)
