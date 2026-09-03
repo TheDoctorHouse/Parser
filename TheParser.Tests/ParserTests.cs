@@ -12,7 +12,7 @@ public class ParserTests
     {
         var lexer = new Lexer(content);
         var astBuilder = new Parser(lexer);
-        return astBuilder.ParseExpression();
+        return astBuilder.ParseAddition();
     }
 
     public Statement ParseStatement(string content)

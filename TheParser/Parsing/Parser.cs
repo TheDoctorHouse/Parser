@@ -48,7 +48,7 @@ public class Parser(Lexer lexer)
 
         ConsumeOrFail(TokenType.Equals, start);
 
-        var expr = ParseExpression();
+        var expr = ParseAddition();
         ConsumeOrFail(TokenType.Semicolon, start);
 
         return new VariableDeclarationStatement(identifier, expr, new SourceSpan(start, CurrentPosition - start));
@@ -57,7 +57,7 @@ public class Parser(Lexer lexer)
     public ExpressionStatement ParseExpressionStatement()
     {
         int start = CurrentPosition;
-        Expr expr = ParseExpression();
+        Expr expr = ParseAddition();
 
         ConsumeOrFail(TokenType.Semicolon, start);
 
@@ -65,6 +65,11 @@ public class Parser(Lexer lexer)
     }
 
     public Expr ParseExpression()
+    {
+        return ParseAddition();
+    }
+
+    public Expr ParseAddition()
     {
         int start = CurrentPosition;
         Expr expr = ParseTerm();
@@ -132,7 +137,7 @@ public class Parser(Lexer lexer)
         {
             do
             {
-                Expr arg = ParseExpression();
+                Expr arg = ParseAddition();
                 arguments.Add(arg);
             } while (Match(TokenType.Comma));
         }
@@ -168,7 +173,7 @@ public class Parser(Lexer lexer)
 
         if (Match(TokenType.OpeningParentheses))
         {
-            Expr expr = ParseExpression();
+            Expr expr = ParseAddition();
             Next();
             return expr;
         }
