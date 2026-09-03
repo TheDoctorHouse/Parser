@@ -142,6 +142,24 @@ public class Lexer
         return true;
     }
 
+    private bool TryConsume(string value)
+    {
+        int initialPos = Position;
+
+        foreach (var c in value)
+        {
+            if (Position >= _content.Length || c != _content[Position])
+            {
+                Position = initialPos;
+                return false;
+            }
+
+            Position++;
+        }
+
+        return true;
+    }
+
     public SourceSpan CreateSpan()
     {
         return new SourceSpan(Position, 1);
