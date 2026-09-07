@@ -4,6 +4,7 @@ using TheParser.Lexing;
 using TheParser.Runtime.Functions;
 using TheParser.Runtime.Exceptions;
 using TheParser.DependencyInjection;
+using System.Collections;
 
 namespace TheParser.Runtime;
 
@@ -106,12 +107,25 @@ public class Interpreter
 
     private Interpretation SolveBinaryOperation(Interpretation left, TokenType @operator, Interpretation right, SourceSpan span)
     {
+        if (left is NothingInterpretation)
+        {
+            throw new OperationInterpretationException(
+                "Cannot operate with nothing types.\n" +
+                $"Tried to operate with: {left.GetType().Name} and {right.GetType().Name}." +
+                "\nDid you forget do add an initializer?",
+                span
+                );
+        }
+
         Debug.Assert(TokenUtility.IsOperator(@operator));
+
+        if (TokenUtility.IsComparisonOperator(@operator))
+            return CalculateComparison(left, @operator, right, span);
 
         switch (left)
         {
             case NumberInterpretation leftNumber when right is NumberInterpretation rightNumber:
-                double value = Calculate(leftNumber.Value, @operator, rightNumber.Value);
+                double value = CalculateDoubles(leftNumber.Value, @operator, rightNumber.Value);
                 return new NumberInterpretation(value);
             case IStringInterpretable leftStr
             when right is IStringInterpretable rightStr
@@ -123,9 +137,47 @@ public class Interpreter
         }
     }
 
-    private static double Calculate(double left, TokenType @operator, double right)
+    private static BooleanInterpretation CalculateComparison(
+        Interpretation left,
+        TokenType comparisonOperator,
+        Interpretation right,
+        SourceSpan span)
     {
+        switch (left)
+        {
+            case NumberInterpretation lNi when right is NumberInterpretation rNi:
+                switch (comparisonOperator)
+                {
+                    case TokenType.EqualsEquals:
+                        return new(lNi.Value == rNi.Value);
+                    case TokenType.LessEqual:
+                        return new(lNi.Value <= rNi.Value);
+                    case TokenType.GreaterEqual:
+                        return new(lNi.Value >= rNi.Value);
+                    case TokenType.Greater:
+                        return new(lNi.Value > rNi.Value);
+                    case TokenType.Less:
+                        return new(lNi.Value < rNi.Value);
+                    case TokenType.NotEqual:
+                        return new(lNi.Value != rNi.Value);
+                }
+                break;
+            case BooleanInterpretation lBi when right is BooleanInterpretation rBi:
+                switch (comparisonOperator)
+                {
+                    case TokenType.EqualsEquals:
+                        return new(lBi.Value == rBi.Value);
+                    case TokenType.NotEqual:
+                        return new(lBi.Value != rBi.Value);
+                }
+                break;
+        }
 
+        throw new OperationInterpretationException(left, comparisonOperator, right, span);
+    }
+
+    private static double CalculateDoubles(double left, TokenType @operator, double right)
+    {
         return @operator switch
         {
             TokenType.Plus => left + right,

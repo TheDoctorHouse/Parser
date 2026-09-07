@@ -14,9 +14,20 @@ public static class TokenUtility
             TokenType.LessEqual => "<=",
             TokenType.GreaterEqual => ">=",
             TokenType.NotEqual => "!=",
-            _ => IsOperator(tokenType) ? throw new NotImplementedException() 
+            _ => IsOperator(tokenType) ? throw new NotImplementedException()
             : throw new InvalidOperationException("Not an operator token: " + tokenType)
         };
+    }
+
+    public static bool IsComparisonOperator(TokenType tokenType)
+    {
+        return tokenType is
+            TokenType.EqualsEquals or
+            TokenType.LessEqual or
+            TokenType.GreaterEqual or
+            TokenType.Greater or
+            TokenType.Less or
+            TokenType.NotEqual;
     }
 
     public static bool IsOperator(TokenType tokenType)
