@@ -32,7 +32,7 @@ public class Interpreter
             case VariableDeclarationStatement vds:
                 var interp = vds.Initializer != null ?
                  InterpretExpression(vds.Initializer) :
-                 new NullInterpretation();
+                 new NothingInterpretation();
 
                 _variables.Add((string)vds.Identifier.Value!, interp);
                 break;
