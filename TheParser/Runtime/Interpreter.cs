@@ -107,7 +107,7 @@ public class Interpreter
 
     private Interpretation SolveBinaryOperation(Interpretation left, TokenType @operator, Interpretation right, SourceSpan span)
     {
-        if (left is NothingInterpretation)
+        if (left is NothingInterpretation || right is NothingInterpretation)
         {
             throw new OperationInterpretationException(
                 "Cannot operate with nothing types.\n" +
