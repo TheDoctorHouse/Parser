@@ -56,7 +56,7 @@ public class RuntimeTests
 
     [Theory]
     [InlineData("@bar = 123; Print();")]
-    [InlineData("@foo; Print(foo);")]
+    [InlineData("@foo; @bar; Print(foo, bar);")]
     public void InterpretStatement_IncorrectArguments_ThrowsInvalidArgumentsException(string input)
     {
         Statement st = ParseStatement(input);
