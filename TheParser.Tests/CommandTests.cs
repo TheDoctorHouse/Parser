@@ -100,6 +100,7 @@ public class CommandTests
     [InlineData("foo", "Identifier(foo)")]
     [InlineData("@somebool = 123 >= 124;", "Declaration Identifier(somebool) Equals Number(123) GreaterEqual Number(124) Semicolon")]
     [InlineData("<", "Less")]
+    [InlineData("!=", "NotEqual")]
     public void LexCode_CorrectUsage_ProvidesCorrectOutput(string code, string expected)
     {
         const string commandName = "lex-code";

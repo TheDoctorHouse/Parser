@@ -159,6 +159,8 @@ public class Lexer
                 token = CreateToken(TokenType.Greater);
                 break;
             case '!':
+                NextCharacter();
+
                 if (TryConsume("="))
                 {
                     token = CreateToken(TokenType.NotEqual);
