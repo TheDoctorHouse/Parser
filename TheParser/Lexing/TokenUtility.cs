@@ -10,7 +10,12 @@ public static class TokenUtility
             TokenType.Minus => "-",
             TokenType.Multiply => "*",
             TokenType.Divide => "/",
-            _ => throw new InvalidOperationException("Not an operator token: " + tokenType),
+            TokenType.EqualsEquals => "==",
+            TokenType.LessEqual => "<=",
+            TokenType.GreaterEqual => ">=",
+            TokenType.NotEqual => "!=",
+            _ => IsOperator(tokenType) ? throw new NotImplementedException() 
+            : throw new InvalidOperationException("Not an operator token: " + tokenType)
         };
     }
 
