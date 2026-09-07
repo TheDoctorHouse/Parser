@@ -89,8 +89,8 @@ public class RuntimeTests
 
         Assert.True(printer.TryDequeue(out string? output));
         Assert.Equal(expectedOutput, output);
-    }    
-    
+    }
+
     [Theory]
     [InlineData("@a; a == 123;")]
     [InlineData("@a; 123 == a;")]
