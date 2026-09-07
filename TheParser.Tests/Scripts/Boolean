@@ -1,0 +1,3 @@
+@someBoolean = true;
+
+Print(someBoolean);

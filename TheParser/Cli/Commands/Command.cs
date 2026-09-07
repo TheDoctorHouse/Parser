@@ -2,7 +2,6 @@ namespace TheParser.Cli.Commands;
 
 public abstract class CliCommand
 {
-    public abstract Resource CommandDescription { get; }
     public abstract CliCommandResult Run(ArgumentsProvider argumentsProvider);
 
     /// <summary>

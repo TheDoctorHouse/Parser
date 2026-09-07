@@ -4,7 +4,8 @@ Usage:
 parser <command> [--stacktrace]
 
 Commands:
-help    Display help information about a command.
-run    Run the lexer, parser, and interpreter on a file.
+help      Display help information about a command.
+run       Run the lexer, parser, and interpreter on a file.
+lex-code  Output tokens of the provided code.
 
 Run 'parser help <command>' for more information about a command.

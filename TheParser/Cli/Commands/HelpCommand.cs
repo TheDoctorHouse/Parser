@@ -7,8 +7,6 @@ namespace TheParser.Cli.Commands;
 [OptionalPositionals("command")]
 public class HelpCommand : CliCommand
 {
-    public override Resource CommandDescription => Resource.HelpDescription;
-
     public override CliCommandResult Run(ArgumentsProvider argumentsProvider)
     {
         string? commandName = argumentsProvider.ReadOptionalPositioned(0);

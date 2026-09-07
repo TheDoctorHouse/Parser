@@ -3,7 +3,6 @@ using TheParser.Lexing;
 using TheParser.Parsing;
 using TheParser.Runtime;
 using TheParser.Runtime.Exceptions;
-using TheParser.Runtime.Functions;
 using TheParser.Runtime.Functions.Attributes;
 using TheParser.Syntax;
 
@@ -11,27 +10,15 @@ namespace TheParser.Tests;
 
 public class RuntimeTests
 {
-    private static IEnumerable<Type> GetBuiltInFunctionTypes()
-    {
-        var assembly = typeof(BuiltInFunction).Assembly;
-
-        var functions = assembly.GetTypes().Where(
-            t => !t.IsAbstract &&
-            typeof(BuiltInFunction).IsAssignableFrom(t));
-
-        return functions;
-    }
-
-
     [Fact]
     public void BuiltInFunctions_ArgumentsAssignableToInterpretationOrInterpretationConstraintTypes()
     {
-        var funcTypes = GetBuiltInFunctionTypes();
+        var funcTypes = TestUtility.GetBuiltInFunctionTypes();
 
         foreach (var f in funcTypes)
         {
             var attr = f.GetCustomAttribute<BuiltInFunctionAttribute>();
-            Assert.NotNull(attr);
+            Assert.True(attr is not null, $"Problem with {f.FullName}");
             foreach (var arg in attr.Arguments)
             {
                 bool assignableToIntepretation = typeof(Interpretation).IsAssignableFrom(arg);

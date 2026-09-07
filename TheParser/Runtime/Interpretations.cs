@@ -36,4 +36,12 @@ public record class NumberInterpretation(double Value) : Interpretation, IString
     }
 }
 
+public record class BooleanInterpretation(bool Value) : Interpretation, IStringInterpretable
+{
+    public StringInterpretation InterpretToString()
+    {
+        return new StringInterpretation(Value.ToString());
+    }
+}
+
 public record class NullInterpretation : Interpretation;

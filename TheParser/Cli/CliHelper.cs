@@ -10,6 +10,7 @@ public enum Resource
     UnknownCommand,
     RunDescription,
     HelpDescription,
+    LexCodeDescription,
 }
 
 public static class CliHelper
@@ -47,6 +48,7 @@ public static class CliHelper
             Resource.HelpGeneral => "Help.Help",
             Resource.HelpDescription => "Help.Commands.Help",
             Resource.RunDescription => "Help.Commands.Run",
+            Resource.LexCodeDescription => "Help.Commands.LexCode",
             Resource.UnknownCommand => "Help.UnknownCommand",
             _ => throw new ArgumentOutOfRangeException(nameof(resource), resource, null),
         };

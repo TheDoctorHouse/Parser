@@ -54,6 +54,14 @@ public record class StringExpression(string Value, SourceSpan Span) : Expr(Span)
     }
 }
 
+public record class BooleanExpression(bool Value, SourceSpan Span) : Expr(Span), IPrintableInformator
+{
+    public string GetInformation()
+    {
+        return Value.ToString();
+    }
+}
+
 public record class UnaryExpression(Expr Expr, TokenType Operator, SourceSpan Span) : Expr(Span), IPrintableInformator
 {
     public string GetInformation()
