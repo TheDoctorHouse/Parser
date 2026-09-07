@@ -46,41 +46,8 @@ public class Lexer
 
         var currentChar = _content[Position];
 
-        switch (currentChar)
-        {
-            case '+':
-                NextCharacter();
-                return CreateToken(TokenType.Plus);
-            case '-':
-                NextCharacter();
-                return CreateToken(TokenType.Minus);
-            case '*':
-                NextCharacter();
-                return CreateToken(TokenType.Multiply);
-            case '/':
-                NextCharacter();
-                return CreateToken(TokenType.Divide);
-            case '(':
-                NextCharacter();
-                return CreateToken(TokenType.OpeningParentheses);
-            case ')':
-                NextCharacter();
-                return CreateToken(TokenType.ClosingParentheses);
-            case ';':
-                NextCharacter();
-                return CreateToken(TokenType.Semicolon);
-            case ',':
-                NextCharacter();
-                return CreateToken(TokenType.Comma);
-            case '@':
-                NextCharacter();
-                return CreateToken(TokenType.Declaration);
-            case '=':
-                NextCharacter();
-                return CreateToken(TokenType.Equals);
-            default:
-                break;
-        }
+        if (TryConsumeSymbolToken(currentChar, out Token? token))
+            return token!;
 
         if (char.IsWhiteSpace(currentChar))
         {
@@ -118,6 +85,97 @@ public class Lexer
             );
     }
 
+    private bool TryConsumeSymbolToken(in char currentChar, out Token? token)
+    {
+        switch (currentChar)
+        {
+            case '+':
+                NextCharacter();
+                token = CreateToken(TokenType.Plus);
+                break;
+            case '-':
+                NextCharacter();
+                token = CreateToken(TokenType.Minus);
+                break;
+            case '*':
+                NextCharacter();
+                token = CreateToken(TokenType.Multiply);
+                break;
+            case '/':
+                NextCharacter();
+                token = CreateToken(TokenType.Divide);
+                break;
+            case '(':
+                NextCharacter();
+                token = CreateToken(TokenType.OpeningParentheses);
+                break;
+            case ')':
+                NextCharacter();
+                token = CreateToken(TokenType.ClosingParentheses);
+                break;
+            case ';':
+                NextCharacter();
+                token = CreateToken(TokenType.Semicolon);
+                break;
+            case ',':
+                NextCharacter();
+                token = CreateToken(TokenType.Comma);
+                break;
+            case '@':
+                NextCharacter();
+                token = CreateToken(TokenType.Declaration);
+                break;
+            case '=':
+                NextCharacter();
+
+                if (TryConsume("="))
+                {
+                    token = CreateToken(TokenType.EqualsEquals);
+                    break;
+                }
+
+                token = CreateToken(TokenType.Equals);
+                break;
+            case '<':
+                NextCharacter();
+
+                if (TryConsume("="))
+                {
+                    token = CreateToken(TokenType.LessEqual);
+                    break;
+                }
+
+                token = CreateToken(TokenType.Less);
+                break;
+            case '>':
+                NextCharacter();
+
+                if (TryConsume("="))
+                {
+                    token = CreateToken(TokenType.GreaterEqual);
+                    break;
+                }
+
+                token = CreateToken(TokenType.Greater);
+                break;
+            case '!':
+                NextCharacter();
+
+                if (TryConsume("="))
+                {
+                    token = CreateToken(TokenType.NotEqual);
+                    break;
+                }
+
+                goto default;
+            default:
+                token = default;
+                return false;
+        }
+
+        return true;
+    }
+
     private bool TryConsumeKeyword(string word)
     {
         int initialPos = Position;
@@ -142,12 +200,30 @@ public class Lexer
         return true;
     }
 
+    private bool TryConsume(string value)
+    {
+        int initialPos = Position;
+
+        foreach (var c in value)
+        {
+            if (Position >= _content.Length || c != _content[Position])
+            {
+                Position = initialPos;
+                return false;
+            }
+
+            Position++;
+        }
+
+        return true;
+    }
+
     public SourceSpan CreateSpan()
     {
         return new SourceSpan(Position, 1);
     }
 
-    private static bool IsIdentifierCharacter(char c) => c is >= 'a' and <= 'z' or >= 'A' and <= 'Z';
+    private static bool IsIdentifierCharacter(char c) => c is >= 'a' and <= 'z' or >= 'A' and <= 'Z' or >= '0' and <= '9';
 
     private string ParseString()
     {

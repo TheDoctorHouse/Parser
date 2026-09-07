@@ -66,6 +66,34 @@ public class Parser(Lexer lexer)
 
     public Expr ParseExpression()
     {
+        return ParseComparison();
+    }
+
+    public Expr ParseComparison()
+    {
+        Expr expr = ParseAddition();
+        int start = CurrentPosition;
+
+        while (Match(
+            TokenType.EqualsEquals,
+            TokenType.LessEqual,
+            TokenType.GreaterEqual,
+            TokenType.NotEqual,
+            TokenType.Less,
+            TokenType.Greater))
+        {
+            Token op = Current;
+
+            Expr right = ParseExpression();
+
+            expr = new BinaryExpression(expr, op.TokenType, right, new SourceSpan(start, CurrentPosition - start));
+        }
+
+        return expr;
+    }
+
+    public Expr ParseAddition()
+    {
         int start = CurrentPosition;
         Expr expr = ParseTerm();
 

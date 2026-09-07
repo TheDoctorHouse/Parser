@@ -1,0 +1,9 @@
+Output an abstract syntax tree representation of the provided code.
+
+Usage:
+  {0}
+Arguments:
+  <code>      A string that will be parsed.
+
+Example:
+  parser ast-code "bool value = Foo();"
