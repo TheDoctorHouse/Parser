@@ -171,6 +171,15 @@ public class Interpreter
                         return new(lBi.Value != rBi.Value);
                 }
                 break;
+            case StringInterpretation rSi when right is StringInterpretation lSi:
+                switch (comparisonOperator)
+                {
+                    case TokenType.EqualsEquals:
+                        return new(lSi.Value == rSi.Value);
+                    case TokenType.NotEqual:
+                        return new(lSi.Value != rSi.Value);
+                }
+                break;
         }
 
         throw new OperationInterpretationException(left, comparisonOperator, right, span);

@@ -3,6 +3,7 @@ using TheParser.Cli.IO;
 using TheParser.DependencyInjection;
 using TheParser.Runtime.Functions;
 using TheParser.Runtime.IO;
+using TheParser.Tests;
 
 public static class TestUtility
 {
