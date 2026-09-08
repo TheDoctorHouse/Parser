@@ -21,6 +21,8 @@ public enum TokenType
     EOF,
     OpeningParentheses,
     ClosingParentheses,
+    If,
+    Else,
     OpeningBrace,
     ClosingBrace,
     Identifier,
