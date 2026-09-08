@@ -48,20 +48,24 @@ public class Parser(Lexer lexer)
 
         ConsumeOrFail(TokenType.ClosingParentheses, start);
         ConsumeOrFail(TokenType.OpeningBrace, start);
-        
+
         var then = ParseBlockStatement();
 
         ConsumeOrFail(TokenType.ClosingBrace, start);
 
         if (!Match(TokenType.Else))
             return new IfStatement(expr, then, null, new SourceSpan(start, CurrentPosition - start));
-        
+
         if (Match(TokenType.If))
             return new IfStatement(expr, then, ParseIfStatement(), new SourceSpan(start, CurrentPosition - start));
-        
+
         if (Match(TokenType.OpeningBrace))
-            return new IfStatement(expr, then, ParseBlockStatement(), new SourceSpan(start, CurrentPosition - start));
-        
+        {
+            var bs = ParseBlockStatement();
+            ConsumeOrFail(TokenType.ClosingBrace, start);
+            return new IfStatement(expr, then, bs, new SourceSpan(start, CurrentPosition - start));
+        }
+
         throw UnexpectedToken(start, TokenType.OpeningBrace, TokenType.If);
     }
 

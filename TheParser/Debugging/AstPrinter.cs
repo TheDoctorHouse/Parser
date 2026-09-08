@@ -43,6 +43,23 @@ public class AstPrinter
                 else
                     AppendMessage("No initializer");
                 break;
+            case IfStatement i:
+
+                AppendMessage("Condition");
+                HandleExpression(i.Condition, 2);
+
+                AppendMessage("Then");
+
+                HandleStatement(i.Then, 2);
+
+                if (i.Else == null)
+                    break;
+
+                AppendMessage("Else");
+
+                HandleStatement(i.Else, 2);
+
+                break;
             default:
                 throw new InvalidOperationException($"Unexpected statement type: `{statement.GetType().FullName}`");
         }
