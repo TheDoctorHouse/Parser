@@ -60,6 +60,7 @@ public class AstPrinter
             case NumberExpression:
             case StringExpression:
             case BooleanExpression:
+            case IdentifierExpression:
                 break;
             case BinaryExpression be:
                 AppendMessage("Left");

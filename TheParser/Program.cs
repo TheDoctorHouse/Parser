@@ -11,7 +11,6 @@ if (args.Length == 0)
     return 3;
 }
 
-
 var commandName = args[0];
 
 
