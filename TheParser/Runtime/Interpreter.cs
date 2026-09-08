@@ -35,6 +35,18 @@ public class Interpreter
 
                 _variables.Add((string)vds.Identifier.Value!, interp);
                 break;
+            case IfStatement @is:
+                var conditionResult = InterpretExpression(@is.Condition);
+                if (conditionResult is not BooleanInterpretation isTrue)
+                    throw new UnexpectedTypeException(
+                        $"Expected {nameof(BooleanInterpretation)}, got {conditionResult.GetType().Name}",
+                        @is.Condition.Span);
+
+                if (isTrue.Value)
+                    InterpretStatement(@is.Then);
+                else if (@is.Else is not null)
+                    InterpretStatement(@is.Else);
+                break;
         }
     }
 

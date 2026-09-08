@@ -13,7 +13,6 @@ if (args.Length == 0)
 
 var commandName = args[0];
 
-
 CommandType? commandType = CommandHelper.GetCommandType(commandName);
 
 if (commandType == null)
