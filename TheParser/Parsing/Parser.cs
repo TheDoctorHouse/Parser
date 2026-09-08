@@ -243,6 +243,9 @@ public class Parser(Lexer lexer)
 
     private UnexpectedTokenException UnexpectedToken(int start, params TokenType[] expected)
     {
+        if (_previous == null)
+            Next();
+
         return new UnexpectedTokenException(
             Current.TokenType,
             new SourceSpan(start, CurrentPosition - start),
