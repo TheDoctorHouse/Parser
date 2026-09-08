@@ -4,7 +4,6 @@ using TheParser.Lexing;
 using TheParser.Runtime.Functions;
 using TheParser.Runtime.Exceptions;
 using TheParser.DependencyInjection;
-using System.Collections;
 
 namespace TheParser.Runtime;
 
