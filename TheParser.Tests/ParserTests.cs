@@ -34,9 +34,25 @@ public class ParserTests
         Assert.Equal(TokenType.Multiply, multiply.Operator);
     }
 
-    [Fact]
-    public void Parse_GroupWithoutClosingParenthesis()
+    [Theory]
+    [InlineData("(1 + 2;", TokenType.Semicolon)]
+    [InlineData("if {}", TokenType.OpeningBrace)]
+    [InlineData("if (true) { } else () { }", TokenType.OpeningParentheses)]
+    [InlineData("else if (false) { }", TokenType.Else)]
+    [InlineData("if () { }", TokenType.OpeningParentheses)]
+    public void ParseStatement_IncorrectInput_ThrowsUnexpectedTokenException(string input, TokenType received)
     {
-        Assert.Throws<UnexpectedTokenException>(() => ParseStatement("(1 + 2;"));
+        var ex = Assert.Throws<UnexpectedTokenException>(() => ParseStatement(input));
+        Assert.Equal(received, ex.ReceivedToken);
+    }
+
+    [Theory]
+    [InlineData("if (true) { }")]
+    [InlineData("if (FunctionCall()) { Foo(); Bar(); }")]
+    [InlineData("if (true) { if (false) { Foo(); } else { Bar(); } } else { FooBar(); }")]
+    [InlineData("@something = Foo();")]
+    public void ParseStatement_ValidInput_ReturnsStatement(string input)
+    {
+        Assert.NotNull(ParseStatement(input));
     }
 }

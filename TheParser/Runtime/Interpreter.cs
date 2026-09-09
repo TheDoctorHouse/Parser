@@ -4,7 +4,6 @@ using TheParser.Lexing;
 using TheParser.Runtime.Functions;
 using TheParser.Runtime.Exceptions;
 using TheParser.DependencyInjection;
-using System.Collections;
 
 namespace TheParser.Runtime;
 
@@ -35,6 +34,18 @@ public class Interpreter
                  new NothingInterpretation();
 
                 _variables.Add((string)vds.Identifier.Value!, interp);
+                break;
+            case IfStatement @is:
+                var conditionResult = InterpretExpression(@is.Condition);
+                if (conditionResult is not BooleanInterpretation isTrue)
+                    throw new UnexpectedTypeException(
+                        $"Expected {nameof(BooleanInterpretation)}, got {conditionResult.GetType().Name}",
+                        @is.Condition.Span);
+
+                if (isTrue.Value)
+                    InterpretStatement(@is.Then);
+                else if (@is.Else is not null)
+                    InterpretStatement(@is.Else);
                 break;
         }
     }

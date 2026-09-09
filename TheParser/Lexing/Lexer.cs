@@ -14,6 +14,9 @@ public class Lexer
     private const string TrueKeyword = "true";
     private const string FalseKeyword = "false";
 
+    private const string IfKeyword = "if";
+    private const string ElseKeyword = "else";
+
     public Lexer(string input)
     {
         _content = input;
@@ -60,6 +63,13 @@ public class Lexer
 
         if (TryConsumeKeyword(FalseKeyword))
             return CreateToken(TokenType.Boolean, value: false);
+
+        if (TryConsumeKeyword(IfKeyword))
+            return CreateToken(TokenType.If);
+
+        if (TryConsumeKeyword(ElseKeyword))
+            return CreateToken(TokenType.Else);
+
 
         if (char.IsDigit(currentChar))
         {
@@ -124,6 +134,14 @@ public class Lexer
             case '@':
                 NextCharacter();
                 token = CreateToken(TokenType.Declaration);
+                break;
+            case '{':
+                NextCharacter();
+                token = CreateToken(TokenType.OpeningBrace);
+                break;
+            case '}':
+                NextCharacter();
+                token = CreateToken(TokenType.ClosingBrace);
                 break;
             case '=':
                 NextCharacter();

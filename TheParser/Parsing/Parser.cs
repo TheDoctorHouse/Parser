@@ -4,6 +4,7 @@ using TheParser.Syntax;
 
 using System.Diagnostics;
 using TheParser.Parsing.Exceptions;
+using System.Security.Cryptography.X509Certificates;
 
 namespace TheParser.Parsing;
 
@@ -16,21 +17,56 @@ public class Parser(Lexer lexer)
 
     public BlockStatement ParseBlockStatement()
     {
+        TokenType closingToken = _previous == null ? TokenType.EOF : TokenType.ClosingBrace;
+
         List<Statement> statements = [];
 
         int start = CurrentPosition;
 
-        while (Peek().TokenType != TokenType.EOF)
+        while (Peek().TokenType != closingToken)
         {
             Statement st;
             if (Match(TokenType.Declaration))
                 st = ParseVariableDeclaration();
+            else if (Match(TokenType.If))
+                st = ParseIfStatement();
             else
                 st = ParseExpressionStatement();
             statements.Add(st);
         }
 
         return new BlockStatement(statements, new SourceSpan(start, CurrentPosition - start));
+    }
+
+    public IfStatement ParseIfStatement()
+    {
+        int start = CurrentPosition;
+
+        ConsumeOrFail(TokenType.OpeningParentheses, start);
+
+        var expr = ParseExpression();
+
+        ConsumeOrFail(TokenType.ClosingParentheses, start);
+        ConsumeOrFail(TokenType.OpeningBrace, start);
+
+        var then = ParseBlockStatement();
+
+        ConsumeOrFail(TokenType.ClosingBrace, start);
+
+        if (!Match(TokenType.Else))
+            return new IfStatement(expr, then, null, new SourceSpan(start, CurrentPosition - start));
+
+        if (Match(TokenType.If))
+            return new IfStatement(expr, then, ParseIfStatement(), new SourceSpan(start, CurrentPosition - start));
+
+        if (Match(TokenType.OpeningBrace))
+        {
+            var bs = ParseBlockStatement();
+            ConsumeOrFail(TokenType.ClosingBrace, start);
+            return new IfStatement(expr, then, bs, new SourceSpan(start, CurrentPosition - start));
+        }
+
+        throw UnexpectedToken(start, TokenType.OpeningBrace, TokenType.If);
     }
 
     public VariableDeclarationStatement ParseVariableDeclaration()
@@ -207,6 +243,9 @@ public class Parser(Lexer lexer)
 
     private UnexpectedTokenException UnexpectedToken(int start, params TokenType[] expected)
     {
+        if (_previous == null)
+            Next();
+
         return new UnexpectedTokenException(
             Current.TokenType,
             new SourceSpan(start, CurrentPosition - start),

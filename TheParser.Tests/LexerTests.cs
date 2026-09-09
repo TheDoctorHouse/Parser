@@ -22,6 +22,10 @@ public class LexerTests
     [InlineData("=", TokenType.Equals)]
     [InlineData("(", TokenType.OpeningParentheses)]
     [InlineData(")", TokenType.ClosingParentheses)]
+    [InlineData("if", TokenType.If)]
+    [InlineData("else", TokenType.Else)]
+    [InlineData("{", TokenType.OpeningBrace)]
+    [InlineData("}", TokenType.ClosingBrace)]
     public void NextToken_SingleCharacter_ReturnsExpectedToken(string input, TokenType tokenType)
     {
         var lexer = CreateLexer(input);
