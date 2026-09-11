@@ -18,6 +18,7 @@ public enum TokenType
     Less,
     Comma,
     Semicolon,
+    Separator,
     EOF,
     OpeningParentheses,
     ClosingParentheses,

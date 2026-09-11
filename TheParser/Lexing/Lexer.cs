@@ -136,6 +136,10 @@ public class Lexer
                 NextCharacter();
                 token = CreateToken(TokenType.Semicolon);
                 break;
+            case '.':
+                NextCharacter();
+                token = CreateToken(TokenType.Separator);
+                break;
             case ',':
                 NextCharacter();
                 token = CreateToken(TokenType.Comma);
