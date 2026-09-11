@@ -11,12 +11,6 @@ public class Lexer
     private string _content;
     public int Position { get; private set; }
 
-    private const string TrueKeyword = "true";
-    private const string FalseKeyword = "false";
-
-    private const string IfKeyword = "if";
-    private const string ElseKeyword = "else";
-
     public Lexer(string input)
     {
         _content = input;
@@ -58,16 +52,16 @@ public class Lexer
             return NextToken();
         }
 
-        if (TryConsumeKeyword(TrueKeyword))
+        if (TryConsumeKeyword(LexerConstants.TrueKeyword))
             return CreateToken(TokenType.Boolean, value: true);
 
-        if (TryConsumeKeyword(FalseKeyword))
+        if (TryConsumeKeyword(LexerConstants.FalseKeyword))
             return CreateToken(TokenType.Boolean, value: false);
 
-        if (TryConsumeKeyword(IfKeyword))
+        if (TryConsumeKeyword(LexerConstants.IfKeyword))
             return CreateToken(TokenType.If);
 
-        if (TryConsumeKeyword(ElseKeyword))
+        if (TryConsumeKeyword(LexerConstants.ElseKeyword))
             return CreateToken(TokenType.Else);
 
 
