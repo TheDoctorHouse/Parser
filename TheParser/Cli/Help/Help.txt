@@ -6,6 +6,7 @@ parser <command> [--stacktrace]
 Commands:
 help      Display help information about a command.
 run       Run the lexer, parser, and interpreter on a file.
+lex       Run lexer on the specified file, outputing tokens.
 lex-code  Output tokens of the provided code.
 ast-code  Output an abstract syntax tree representation of the provided code.
 

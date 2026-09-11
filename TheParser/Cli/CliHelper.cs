@@ -10,6 +10,7 @@ public enum Resource
     UnknownCommand,
     RunDescription,
     HelpDescription,
+    LexDescription,
     LexCodeDescription,
     AstCodeDescription
 }
@@ -49,6 +50,7 @@ public static class CliHelper
             Resource.HelpGeneral => "Help.Help",
             Resource.HelpDescription => "Help.Commands.Help",
             Resource.RunDescription => "Help.Commands.Run",
+            Resource.LexDescription => "Help.Commands.Lex",
             Resource.LexCodeDescription => "Help.Commands.LexCode",
             Resource.AstCodeDescription => "Help.Commands.AstCode",
             Resource.UnknownCommand => "Help.UnknownCommand",
