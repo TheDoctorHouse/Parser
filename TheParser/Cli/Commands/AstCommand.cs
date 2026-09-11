@@ -7,10 +7,10 @@ using TheParser.Syntax;
 
 namespace TheParser.Cli.Commands;
 
-[CommandName("ast-code")]
+[CommandName("ast")]
 [CommandResource(Resource.AstCodeDescription)]
-[RequirePositionals("code")]
-public class AstCodeCommand : CliCommand
+[RequirePositionals("path")]
+public class AstCommand : CliCommand
 {
     public override CliCommandResult Run(ArgumentsProvider argumentsProvider)
     {

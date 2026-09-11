@@ -1,0 +1,9 @@
+Output an abstract syntax tree representation of the specified file.
+
+Usage:
+  {0}
+Arguments:
+  <path>      Path to the source file
+
+Example:
+  parser ast ./code 

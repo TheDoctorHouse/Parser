@@ -12,6 +12,7 @@ public enum Resource
     HelpDescription,
     LexDescription,
     LexCodeDescription,
+    AstDescription,
     AstCodeDescription
 }
 
@@ -52,6 +53,7 @@ public static class CliHelper
             Resource.RunDescription => "Help.Commands.Run",
             Resource.LexDescription => "Help.Commands.Lex",
             Resource.LexCodeDescription => "Help.Commands.LexCode",
+            Resource.AstDescription => "Help.Commands.Ast",
             Resource.AstCodeDescription => "Help.Commands.AstCode",
             Resource.UnknownCommand => "Help.UnknownCommand",
             _ => throw new ArgumentOutOfRangeException(nameof(resource), resource, null),
