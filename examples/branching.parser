@@ -1,0 +1,15 @@
+Print("Enter your age: ");
+@age = ConvertToNumber(Ask());
+
+if (age >= 21)
+{
+    Print("You are an adult.");
+}
+else if (age >= 18)
+{
+    Print("You probably an adult.");
+}
+else 
+{
+    Print("You are not an adult");
+}
