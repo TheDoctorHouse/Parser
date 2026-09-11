@@ -27,4 +27,6 @@ public enum TokenType
     ClosingBrace,
     Identifier,
     Declaration,
+    DefineSpace,
+    UndefineSpace
 }

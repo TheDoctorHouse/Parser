@@ -7,4 +7,7 @@ public static class LexerConstants
 
     public const string IfKeyword = "if";
     public const string ElseKeyword = "else";
+
+    public const string DefineSpaceKeyword = "defspace";
+    public const string UndefsineSpaceKeyword = "undefspace";
 }

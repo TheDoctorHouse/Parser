@@ -52,18 +52,8 @@ public class Lexer
             return NextToken();
         }
 
-        if (TryConsumeKeyword(LexerConstants.TrueKeyword))
-            return CreateToken(TokenType.Boolean, value: true);
-
-        if (TryConsumeKeyword(LexerConstants.FalseKeyword))
-            return CreateToken(TokenType.Boolean, value: false);
-
-        if (TryConsumeKeyword(LexerConstants.IfKeyword))
-            return CreateToken(TokenType.If);
-
-        if (TryConsumeKeyword(LexerConstants.ElseKeyword))
-            return CreateToken(TokenType.Else);
-
+        if (TryConsumeKeywordToken(out token))
+            return token!;
 
         if (char.IsDigit(currentChar))
         {
@@ -87,6 +77,31 @@ public class Lexer
             $"Cannot resolve character '{currentChar}'.",
             CreateSpan()
             );
+    }
+
+    private bool TryConsumeKeywordToken(out Token? token)
+    {
+        token = null;
+
+        if (TryConsumeKeyword(LexerConstants.TrueKeyword))
+            token = CreateToken(TokenType.Boolean, value: true);
+
+        if (TryConsumeKeyword(LexerConstants.FalseKeyword))
+            token = CreateToken(TokenType.Boolean, value: false);
+
+        if (TryConsumeKeyword(LexerConstants.IfKeyword))
+            token = CreateToken(TokenType.If);
+
+        if (TryConsumeKeyword(LexerConstants.ElseKeyword))
+            token = CreateToken(TokenType.Else);
+
+        if (TryConsumeKeyword(LexerConstants.DefineSpaceKeyword))
+            token = CreateToken(TokenType.DefineSpace);
+
+        if (TryConsumeKeyword(LexerConstants.UndefsineSpaceKeyword))
+            token = CreateToken(TokenType.UndefineSpace);
+
+        return token != null;
     }
 
     private bool TryConsumeSymbolToken(in char currentChar, out Token? token)
