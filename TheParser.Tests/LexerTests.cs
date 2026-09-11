@@ -12,22 +12,31 @@ public class LexerTests
     }
 
     [Theory]
-    [InlineData("+", TokenType.Plus)]
-    [InlineData("-", TokenType.Minus)]
-    [InlineData("*", TokenType.Multiply)]
-    [InlineData("/", TokenType.Divide)]
-    [InlineData(",", TokenType.Comma)]
-    [InlineData(";", TokenType.Semicolon)]
-    [InlineData("@", TokenType.Declaration)]
-    [InlineData("=", TokenType.Equals)]
-    [InlineData("(", TokenType.OpeningParentheses)]
-    [InlineData(")", TokenType.ClosingParentheses)]
+    [InlineData('+', TokenType.Plus)]
+    [InlineData('-', TokenType.Minus)]
+    [InlineData('*', TokenType.Multiply)]
+    [InlineData('/', TokenType.Divide)]
+    [InlineData(',', TokenType.Comma)]
+    [InlineData(';', TokenType.Semicolon)]
+    [InlineData('@', TokenType.Declaration)]
+    [InlineData('=', TokenType.Equals)]
+    [InlineData('(', TokenType.OpeningParentheses)]
+    [InlineData(')', TokenType.ClosingParentheses)]
+    [InlineData('{', TokenType.OpeningBrace)]
+    [InlineData('}', TokenType.ClosingBrace)]
+    [InlineData('.', TokenType.Separator)]
+    public void NextToken_SingleCharacter_ReturnsExpectedToken(char input, TokenType tokenType)
+    {
+        var lexer = CreateLexer(input.ToString());
+        Assert.Equal(tokenType, lexer.NextToken().TokenType);
+    }
+
+    [Theory]
     [InlineData("if", TokenType.If)]
     [InlineData("else", TokenType.Else)]
-    [InlineData("{", TokenType.OpeningBrace)]
-    [InlineData("}", TokenType.ClosingBrace)]
-    [InlineData(".", TokenType.Separator)]
-    public void NextToken_SingleCharacter_ReturnsExpectedToken(string input, TokenType tokenType)
+    [InlineData("defspace", TokenType.DefineSpace)]
+    [InlineData("undefspace", TokenType.UndefineSpace)]
+    public void NextToken_MultipleCharacters_ReturnsExpectedToken(string input, TokenType tokenType)
     {
         var lexer = CreateLexer(input);
         Assert.Equal(tokenType, lexer.NextToken().TokenType);
