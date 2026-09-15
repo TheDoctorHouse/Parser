@@ -14,14 +14,7 @@ public class AstCodeCommand : CliCommand
 {
     public override CliCommandResult Run(ArgumentsProvider argumentsProvider)
     {
-        string filePath = argumentsProvider.ReadPositioned(0);
-
-        if (!File.Exists(filePath))
-        {
-            return IncorrectUsage($"File '{filePath}' does not exist.");
-        }
-
-        string content = File.ReadAllText(filePath);
+        string content = argumentsProvider.ReadPositioned(0);
 
         Lexer lexer = new(content);
 
