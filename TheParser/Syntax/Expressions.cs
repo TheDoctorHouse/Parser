@@ -79,3 +79,5 @@ public record class IdentifierExpression(string Identifier, SourceSpan Span) : E
 }
 
 public record class CallExpression(Expr Callee, IReadOnlyList<Expr> Arguments, SourceSpan Span) : Expr(Span);
+
+public record class SpaceAccessExpression(Expr Callee, Expr Target, SourceSpan Span) : Expr(Span);

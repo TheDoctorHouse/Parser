@@ -4,7 +4,6 @@ using TheParser.Syntax;
 
 using System.Diagnostics;
 using TheParser.Parsing.Exceptions;
-using System.Security.Cryptography.X509Certificates;
 
 namespace TheParser.Parsing;
 
@@ -172,7 +171,20 @@ public class Parser(Lexer lexer)
             return new UnaryExpression(operand, op.TokenType, new SourceSpan(start, CurrentPosition - start));
         }
 
-        return ParseCall();
+        return ParseAccess();
+    }
+
+    private Expr ParseAccess()
+    {
+        var start = CurrentPosition;
+        Expr expr = ParseCall();
+
+        while (Match(TokenType.Separator))
+        {
+            expr = new SpaceAccessExpression(expr, ParseCall(), new SourceSpan(start, CurrentPosition - start));
+        }
+
+        return expr;
     }
 
     private Expr ParseCall()
@@ -239,7 +251,6 @@ public class Parser(Lexer lexer)
 
         throw UnexpectedToken(start);
     }
-
 
     private UnexpectedTokenException UnexpectedToken(int start, params TokenType[] expected)
     {

@@ -103,6 +103,15 @@ public class AstPrinter
                     HandleExpression(arg, 2);
 
                 break;
+            case SpaceAccessExpression sae:
+                AppendMessage("Callee");
+
+                HandleExpression(sae.Callee, 2);
+
+                AppendMessage("Target");
+
+                HandleExpression(sae.Target, 2);
+                break;
             default:
                 throw new InvalidOperationException($"Unexpected expression type: `{ast.GetType().FullName}`");
         }
