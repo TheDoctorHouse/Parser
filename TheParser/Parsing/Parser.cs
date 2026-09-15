@@ -14,6 +14,24 @@ public class Parser(Lexer lexer)
     private int CurrentPosition => lexer.Current != null ? lexer.Current.Position : 0;
     public Token Current => lexer.Current ?? throw new InvalidOperationException("Current token is null.");
 
+
+    public Statement ParseStatement()
+    {
+        if (_previous == null)
+            Next();
+
+        if (_previous == null || Match(TokenType.OpeningBrace))
+        {
+            return ParseBlockStatement();
+        }
+        else if (Match(TokenType.If))
+        {
+            return ParseIfStatement();
+        }
+
+        return ParseExpressionStatement();
+    }
+
     public BlockStatement ParseBlockStatement()
     {
         TokenType closingToken = _previous == null ? TokenType.EOF : TokenType.ClosingBrace;
