@@ -23,6 +23,9 @@ public class AstPrinter
 
         switch (statement)
         {
+            case DefineSpaceStatement:
+            case UndefineSpaceStatement:
+                break;
             case BlockStatement bs:
                 AppendMessage("Statements");
                 foreach (var st in bs.Statements)

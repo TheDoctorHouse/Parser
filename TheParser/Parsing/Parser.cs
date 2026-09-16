@@ -14,24 +14,6 @@ public class Parser(Lexer lexer)
     private int CurrentPosition => lexer.Current != null ? lexer.Current.Position : 0;
     public Token Current => lexer.Current ?? throw new InvalidOperationException("Current token is null.");
 
-
-    public Statement ParseStatement()
-    {
-        if (_previous == null)
-            Next();
-
-        if (_previous == null || Match(TokenType.OpeningBrace))
-        {
-            return ParseBlockStatement();
-        }
-        else if (Match(TokenType.If))
-        {
-            return ParseIfStatement();
-        }
-
-        return ParseExpressionStatement();
-    }
-
     public BlockStatement ParseBlockStatement()
     {
         TokenType closingToken = _previous == null ? TokenType.EOF : TokenType.ClosingBrace;
@@ -42,11 +24,19 @@ public class Parser(Lexer lexer)
 
         while (Peek().TokenType != closingToken)
         {
+            int defStart = CurrentPosition;
             Statement st;
             if (Match(TokenType.Declaration))
                 st = ParseVariableDeclaration();
             else if (Match(TokenType.If))
                 st = ParseIfStatement();
+            else if (Match(TokenType.DefineSpace))
+                st = ParseSpaceDefinition();
+            else if (Match(TokenType.UndefineSpace))
+            {
+                st = new UndefineSpaceStatement(new SourceSpan(defStart, CurrentPosition - defStart));
+                ConsumeOrFail(TokenType.Semicolon, defStart);
+            }
             else
                 st = ParseExpressionStatement();
             statements.Add(st);
@@ -54,6 +44,7 @@ public class Parser(Lexer lexer)
 
         return new BlockStatement(statements, new SourceSpan(start, CurrentPosition - start));
     }
+
 
     public IfStatement ParseIfStatement()
     {
@@ -105,6 +96,22 @@ public class Parser(Lexer lexer)
         ConsumeOrFail(TokenType.Semicolon, start);
 
         return new VariableDeclarationStatement(identifier, expr, new SourceSpan(start, CurrentPosition - start));
+    }
+
+    public DefineSpaceStatement ParseSpaceDefinition()
+    {
+        int start = CurrentPosition;
+
+        if (!Match(TokenType.Identifier))
+            throw UnexpectedToken(start, TokenType.Identifier);
+
+        var identifier = Current;
+        Debug.Assert(Current.Value is string);
+
+        if (Match(TokenType.Semicolon))
+            return new DefineSpaceStatement(identifier, new SourceSpan(start, CurrentPosition - start));
+
+        throw UnexpectedToken(start, TokenType.Semicolon);
     }
 
     public ExpressionStatement ParseExpressionStatement()
