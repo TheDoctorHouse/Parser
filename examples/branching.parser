@@ -1,15 +1,15 @@
-Print("Enter your age: ");
-@age = ConvertToNumber(Ask());
+env.Print("Enter your age: ");
+@age = env.ConvertToNumber(env.Ask());
 
 if (age >= 21)
 {
-    Print("You are an adult.");
+    env.Print("You are an adult.");
 }
 else if (age >= 18)
 {
-    Print("You probably an adult.");
+    env.Print("You probably an adult.");
 }
 else 
 {
-    Print("You are not an adult");
+    env.Print("You are not an adult");
 }
