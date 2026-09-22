@@ -146,7 +146,10 @@ public class Interpreter
 
         var identifier = (string)defineSpace.Identifier.Value!;
         if (!_spaces.TryGetValue(identifier, out _currentSpace!))
+        {
             _currentSpace = new Space(identifier);
+            _spaces.Add(identifier, _currentSpace);
+        }
     }
 
     private void UndefineSpace(SourceSpan span)
