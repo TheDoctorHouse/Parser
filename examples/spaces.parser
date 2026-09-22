@@ -1,0 +1,13 @@
+@defaultSpaceVariable = 200;
+env.Print(defaultSpaceVariable + "\n");
+
+defspace OtherSpace;
+
+@otherSpaceVariable = "other space";
+
+undefspace;
+
+defspace ThirdSpace;
+
+env.Print(OtherSpace.otherSpaceVariable + "\n");
+env.Print(free.defaultSpaceVariable);
