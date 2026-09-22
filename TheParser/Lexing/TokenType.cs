@@ -18,6 +18,7 @@ public enum TokenType
     Less,
     Comma,
     Semicolon,
+    Separator,
     EOF,
     OpeningParentheses,
     ClosingParentheses,
@@ -27,4 +28,6 @@ public enum TokenType
     ClosingBrace,
     Identifier,
     Declaration,
+    DefineSpace,
+    UndefineSpace
 }

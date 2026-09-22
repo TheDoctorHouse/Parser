@@ -1,1 +1,1 @@
-Print("Hello, world!\n");
+env.Print("Hello, world!\n");

@@ -23,6 +23,9 @@ public class AstPrinter
 
         switch (statement)
         {
+            case DefineSpaceStatement:
+            case UndefineSpaceStatement:
+                break;
             case BlockStatement bs:
                 AppendMessage("Statements");
                 foreach (var st in bs.Statements)
@@ -102,6 +105,15 @@ public class AstPrinter
                 foreach (Expr arg in ce.Arguments)
                     HandleExpression(arg, 2);
 
+                break;
+            case SpaceAccessExpression sae:
+                AppendMessage("Callee");
+
+                HandleExpression(sae.Callee, 2);
+
+                AppendMessage("Target");
+
+                HandleExpression(sae.Target, 2);
                 break;
             default:
                 throw new InvalidOperationException($"Unexpected expression type: `{ast.GetType().FullName}`");

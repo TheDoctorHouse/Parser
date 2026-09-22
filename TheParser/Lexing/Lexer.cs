@@ -11,12 +11,6 @@ public class Lexer
     private string _content;
     public int Position { get; private set; }
 
-    private const string TrueKeyword = "true";
-    private const string FalseKeyword = "false";
-
-    private const string IfKeyword = "if";
-    private const string ElseKeyword = "else";
-
     public Lexer(string input)
     {
         _content = input;
@@ -58,18 +52,8 @@ public class Lexer
             return NextToken();
         }
 
-        if (TryConsumeKeyword(TrueKeyword))
-            return CreateToken(TokenType.Boolean, value: true);
-
-        if (TryConsumeKeyword(FalseKeyword))
-            return CreateToken(TokenType.Boolean, value: false);
-
-        if (TryConsumeKeyword(IfKeyword))
-            return CreateToken(TokenType.If);
-
-        if (TryConsumeKeyword(ElseKeyword))
-            return CreateToken(TokenType.Else);
-
+        if (TryConsumeKeywordToken(out token))
+            return token!;
 
         if (char.IsDigit(currentChar))
         {
@@ -93,6 +77,31 @@ public class Lexer
             $"Cannot resolve character '{currentChar}'.",
             CreateSpan()
             );
+    }
+
+    private bool TryConsumeKeywordToken(out Token? token)
+    {
+        token = null;
+
+        if (TryConsumeKeyword(LexerConstants.TrueKeyword))
+            token = CreateToken(TokenType.Boolean, value: true);
+
+        if (TryConsumeKeyword(LexerConstants.FalseKeyword))
+            token = CreateToken(TokenType.Boolean, value: false);
+
+        if (TryConsumeKeyword(LexerConstants.IfKeyword))
+            token = CreateToken(TokenType.If);
+
+        if (TryConsumeKeyword(LexerConstants.ElseKeyword))
+            token = CreateToken(TokenType.Else);
+
+        if (TryConsumeKeyword(LexerConstants.DefineSpaceKeyword))
+            token = CreateToken(TokenType.DefineSpace);
+
+        if (TryConsumeKeyword(LexerConstants.UndefsineSpaceKeyword))
+            token = CreateToken(TokenType.UndefineSpace);
+
+        return token != null;
     }
 
     private bool TryConsumeSymbolToken(in char currentChar, out Token? token)
@@ -126,6 +135,10 @@ public class Lexer
             case ';':
                 NextCharacter();
                 token = CreateToken(TokenType.Semicolon);
+                break;
+            case '.':
+                NextCharacter();
+                token = CreateToken(TokenType.Separator);
                 break;
             case ',':
                 NextCharacter();

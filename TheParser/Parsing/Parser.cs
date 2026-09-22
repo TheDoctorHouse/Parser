@@ -4,7 +4,6 @@ using TheParser.Syntax;
 
 using System.Diagnostics;
 using TheParser.Parsing.Exceptions;
-using System.Security.Cryptography.X509Certificates;
 
 namespace TheParser.Parsing;
 
@@ -25,11 +24,19 @@ public class Parser(Lexer lexer)
 
         while (Peek().TokenType != closingToken)
         {
+            int defStart = CurrentPosition;
             Statement st;
             if (Match(TokenType.Declaration))
                 st = ParseVariableDeclaration();
             else if (Match(TokenType.If))
                 st = ParseIfStatement();
+            else if (Match(TokenType.DefineSpace))
+                st = ParseSpaceDefinition();
+            else if (Match(TokenType.UndefineSpace))
+            {
+                st = new UndefineSpaceStatement(new SourceSpan(defStart, CurrentPosition - defStart));
+                ConsumeOrFail(TokenType.Semicolon, defStart);
+            }
             else
                 st = ParseExpressionStatement();
             statements.Add(st);
@@ -37,6 +44,7 @@ public class Parser(Lexer lexer)
 
         return new BlockStatement(statements, new SourceSpan(start, CurrentPosition - start));
     }
+
 
     public IfStatement ParseIfStatement()
     {
@@ -88,6 +96,22 @@ public class Parser(Lexer lexer)
         ConsumeOrFail(TokenType.Semicolon, start);
 
         return new VariableDeclarationStatement(identifier, expr, new SourceSpan(start, CurrentPosition - start));
+    }
+
+    public DefineSpaceStatement ParseSpaceDefinition()
+    {
+        int start = CurrentPosition;
+
+        if (!Match(TokenType.Identifier))
+            throw UnexpectedToken(start, TokenType.Identifier);
+
+        var identifier = Current;
+        Debug.Assert(Current.Value is string);
+
+        if (Match(TokenType.Semicolon))
+            return new DefineSpaceStatement(identifier, new SourceSpan(start, CurrentPosition - start));
+
+        throw UnexpectedToken(start, TokenType.Semicolon);
     }
 
     public ExpressionStatement ParseExpressionStatement()
@@ -172,7 +196,20 @@ public class Parser(Lexer lexer)
             return new UnaryExpression(operand, op.TokenType, new SourceSpan(start, CurrentPosition - start));
         }
 
-        return ParseCall();
+        return ParseAccess();
+    }
+
+    private Expr ParseAccess()
+    {
+        var start = CurrentPosition;
+        Expr expr = ParseCall();
+
+        while (Match(TokenType.Separator))
+        {
+            expr = new SpaceAccessExpression(expr, ParseCall(), new SourceSpan(start, CurrentPosition - start));
+        }
+
+        return expr;
     }
 
     private Expr ParseCall()
@@ -239,7 +276,6 @@ public class Parser(Lexer lexer)
 
         throw UnexpectedToken(start);
     }
-
 
     private UnexpectedTokenException UnexpectedToken(int start, params TokenType[] expected)
     {

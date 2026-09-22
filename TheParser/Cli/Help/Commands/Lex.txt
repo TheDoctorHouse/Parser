@@ -1,0 +1,10 @@
+Run lexer on the specified file, outputing tokens.
+
+Usage:
+  {0}
+
+Arguments:
+  <path>      Path to the source file
+
+Example:
+  parser lex ./code
