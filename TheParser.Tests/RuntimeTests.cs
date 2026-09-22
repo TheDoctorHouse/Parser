@@ -37,9 +37,9 @@ public class RuntimeTests
     }
 
     [Theory]
-    [InlineData("@someVar; Print(someMissingVar);")]
-    [InlineData("Print(foo); @foo = \"Bar\";")]
-    [InlineData("@foo = \"123\"; @bar = ConvertToNumber(foO);")]
+    [InlineData("@someVar; env.Print(someMissingVar);")]
+    [InlineData("env.Print(foo); @foo = \"Bar\";")]
+    [InlineData("@foo = \"123\"; @bar = env.ConvertToNumber(foO);")]
     public void InterpretStatement_MissingVariable_ThrowsUnresolvedVariableException(string input)
     {
         Statement st = ParseStatement(input);
@@ -60,8 +60,8 @@ public class RuntimeTests
     }
 
     [Theory]
-    [InlineData("@bar = 123; Print();")]
-    [InlineData("@foo; @bar; Print(foo, bar);")]
+    [InlineData("@bar = 123; env.Print();")]
+    [InlineData("@foo; @bar; env.Print(foo, bar);")]
     public void InterpretStatement_IncorrectArguments_ThrowsInvalidArgumentsException(string input)
     {
         Statement st = ParseStatement(input);
@@ -71,12 +71,12 @@ public class RuntimeTests
     }
 
     [Theory]
-    [InlineData("Print(2 > 3);", "False")]
-    [InlineData("Print(2 == 2);", "True")]
-    [InlineData("Print(false == (2 == 2));", "False")]
-    [InlineData("@a = 213 == 213; @b = false; Print(a != b);", "True")]
-    [InlineData("@a = \"something\"; @b = \"Something\"; Print(a == b);", "False")]
-    [InlineData("@a = \"something\"; @b = \"something\"; Print(a == b);", "True")]
+    [InlineData("env.Print(2 > 3);", "False")]
+    [InlineData("env.Print(2 == 2);", "True")]
+    [InlineData("env.Print(false == (2 == 2));", "False")]
+    [InlineData("@a = 213 == 213; @b = false; env.Print(a != b);", "True")]
+    [InlineData("@a = \"something\"; @b = \"Something\"; env.Print(a == b);", "False")]
+    [InlineData("@a = \"something\"; @b = \"something\"; env.Print(a == b);", "True")]
     public void InterpretStatement_ValidComparison_ReturnsCorrectOutput(string input, string expectedOutput)
     {
         var printer = new TestPrinter();
@@ -94,8 +94,8 @@ public class RuntimeTests
     [Theory]
     [InlineData("@a; a == 123;")]
     [InlineData("@a; 123 == a;")]
-    [InlineData("Print(\"Yeah!\" >= 123);")]
-    [InlineData("Print(\"yeah!\" >= \"yeah!\");")]
+    [InlineData("env.Print(\"Yeah!\" >= 123);")]
+    [InlineData("env.Print(\"yeah!\" >= \"yeah!\");")]
     public void InterpretStatement_InvalidComparison_ThrowsOperationInterpretationException(string input)
     {
         Statement st = ParseStatement(input);

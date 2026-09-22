@@ -18,7 +18,7 @@ public class CommandTests
 
     [Theory]
     [InlineData("Dollar", 1, 1)]
-    [InlineData("NotANumberConversion", 3, 25)]
+    [InlineData("NotANumberConversion", 3, 14)]
     public void RunCommand_IncorrectOutput_ReportsCorrectSourceLocation(string scriptName, int line, int position)
     {
         var path = Path.Combine(AppContext.BaseDirectory, "Scripts", scriptName);

@@ -9,12 +9,22 @@ namespace TheParser.Runtime;
 
 public class Interpreter
 {
-    private Dictionary<string, Interpretation> _variables = new();
-    private Dictionary<string, IFunction> _functions;
+    private Dictionary<string, Space> _spaces = [];
+
+    private const string BuiltInSpaceName = "env";
+    private const string DefaultSpaceName = "free";
+
+    private Space _currentSpace;
 
     public Interpreter(DependencyInjector injector)
     {
-        _functions = BuiltInFunctionScanner.ScanAndCreateBuiltInFunctions(injector);
+        var functions = BuiltInFunctionScanner.ScanAndCreateBuiltInFunctions(injector);
+        var buildInSpace = new Space(BuiltInSpaceName, [], functions);
+        _spaces.Add(buildInSpace.Name, buildInSpace);
+
+        var defaultSpace = new Space(DefaultSpaceName, [], []);
+        _currentSpace = defaultSpace;
+        _spaces.Add(_currentSpace.Name, _currentSpace);
     }
 
     public void InterpretStatement(Statement statement)
@@ -32,8 +42,11 @@ public class Interpreter
                 var interp = vds.Initializer != null ?
                  InterpretExpression(vds.Initializer) :
                  new NothingInterpretation();
+                string varName = (string)vds.Identifier.Value!;
 
-                _variables.Add((string)vds.Identifier.Value!, interp);
+                if (!_currentSpace.TryAddVariable(varName, interp))
+                    throw new VariableDeclarationException($"Variable `{varName}` is already defined.", vds.Span);
+
                 break;
             case IfStatement @is:
                 var conditionResult = InterpretExpression(@is.Condition);
@@ -47,6 +60,12 @@ public class Interpreter
                 else if (@is.Else is not null)
                     InterpretStatement(@is.Else);
                 break;
+            case DefineSpaceStatement ds:
+                DefineSpace(ds);
+                break;
+            case UndefineSpaceStatement uss:
+                UndefineSpace(uss.Span);
+                break;
         }
     }
 
@@ -55,7 +74,7 @@ public class Interpreter
         switch (expr)
         {
             case CallExpression ce:
-                return InvokeFunction(ce);
+                return InvokeFunction(_currentSpace, ce);
             case StringExpression se:
                 return new StringInterpretation(se.Value);
             case NumberExpression ne:
@@ -67,25 +86,25 @@ public class Interpreter
             case UnaryExpression ue:
                 return SolveUnaryOperation(InterpretExpression(ue.Expr), ue.Operator, ue.Span);
             case IdentifierExpression ie:
-                if (!_variables.TryGetValue(ie.Identifier, out var interp))
-                    throw new UnresolvedVariableException(ie.Identifier, ie.Span);
-                return interp;
+                return GetVariableOrFail(_currentSpace, ie);
+            case SpaceAccessExpression sa:
+                return InterpretAccessExpression(sa);
             default:
                 throw new NotImplementedException($"Interpretation of expression `{expr.GetType().Name}` is not implemented.");
         }
     }
 
-    public Interpretation InvokeFunction(CallExpression ce)
+    public Interpretation InvokeFunction(Space space, CallExpression ce)
     {
         if (ce.Callee is not IdentifierExpression functionIdent)
             throw new NotImplementedException();
 
         string identString = functionIdent.Identifier;
 
-        if (!_functions.TryGetValue(identString, out IFunction? func))
+        if (!space.TryGetFunction(identString, out IFunction? func))
             throw new UnresolvedFunctionException(identString, functionIdent.Span);
 
-        var parameters = func.GetParameterTypes();
+        var parameters = func!.GetParameterTypes();
 
         if (parameters.Count != ce.Arguments.Count)
             throw new InvalidArgumentsException(
@@ -114,6 +133,65 @@ public class Interpreter
         {
             throw new FunctionInvocationException("An error occured during function invocation.", ce.Span, fe);
         }
+    }
+
+    private void DefineSpace(DefineSpaceStatement defineSpace)
+    {
+        if (_currentSpace != null && _currentSpace.Name != DefaultSpaceName)
+        {
+            throw new SpaceDefinitionException(
+                $"Space is already defined: {_currentSpace.Name}. Undefine space before defining new.",
+                defineSpace.Span);
+        }
+
+        var identifier = (string)defineSpace.Identifier.Value!;
+        if (!_spaces.TryGetValue(identifier, out _currentSpace!))
+            _currentSpace = new Space(identifier);
+    }
+
+    private void UndefineSpace(SourceSpan span)
+    {
+        if (_currentSpace == null)
+        {
+            throw new SpaceUndefinitionException("Cannot undefine space since it is already undefined.", span);
+        }
+
+        _currentSpace = _spaces[DefaultSpaceName];
+    }
+
+    private static Interpretation GetVariableOrFail(Space space, IdentifierExpression identifier)
+    {
+        if (!space.TryGetVariable(identifier.Identifier, out var interp))
+            throw new UnresolvedVariableException(identifier.Identifier, identifier.Span);
+
+        return interp!;
+    }
+
+    private Interpretation InterpretAccessExpression(SpaceAccessExpression expr)
+    {
+        if (expr.Callee is not IdentifierExpression identifier)
+        {
+            throw new SpaceAccessException(
+                $"`{expr.Callee.GetType().Name}` as a space access callee is not allowed.",
+                expr.Span);
+        }
+
+        if (!_spaces.TryGetValue(identifier.Identifier, out Space? space))
+        {
+            throw new SpaceAccessException(
+                $"Space with name `{identifier.Identifier}` is not defined in the current environment.",
+                identifier.Span
+            );
+        }
+
+        return expr.Target switch
+        {
+            IdentifierExpression ie => GetVariableOrFail(space, ie),
+            CallExpression ce => InvokeFunction(space, ce),
+            _ => throw new SpaceAccessException(
+
+                $"Cannot use expression `{expr.Target.GetType().FullName}` with space access.", expr.Target.Span)
+        };
     }
 
     private Interpretation SolveBinaryOperation(Interpretation left, TokenType @operator, Interpretation right, SourceSpan span)
